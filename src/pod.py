@@ -1,10 +1,10 @@
-from textual.app import App, ComposeResult
-from textual.containers import Container
+from textual.app import App
 from textual.binding import Binding
-from textual.widgets import Header, RadioSet, ContentSwitcher, Switch, Footer, Button, MarkdownViewer, TextArea
-from render import Splash
-from panels import LeftPanel, BottomRight
-from files import MARKDOWN_CONTENT
+from textual.widgets import Switch, RadioSet
+from textual.reactive import reactive
+from textual import events
+from pysui import SuiConfig, AsyncClient
+from screens import LoadingScreen, Mod_Screen
 
 class Pod_By_FrenSuipport(App):
     CSS_PATH = "pod.tcss"
@@ -20,71 +20,52 @@ class Pod_By_FrenSuipport(App):
         )
     ]
 
-    def compose(self) -> ComposeResult:
-        yield Header(show_clock=True)
-        with Container(id="app-grid"):
-            yield LeftPanel(id="left-pane")
-            top_right = ContentSwitcher(initial="splash", id="top-right")
-            top_right.border_title = ":: Content"
-            with top_right:
-                yield Splash(id="splash")
-                for i in range(1, 4):
-                    yield MarkdownViewer(
-                        MARKDOWN_CONTENT[f"content{i}"],
-                        id=f"content{i}", 
-                        show_table_of_contents=False
-                    )
-            yield BottomRight(id="bottom-right")
-        yield Footer()
+    SCREENS = {
+        "loading": LoadingScreen,
+        "main": Mod_Screen
+    }
 
-    # TODO: update needed
-    def on_radio_set_changed(self, event: RadioSet.Changed) -> None:
-        selected_option = event.pressed.id
-        content_id = f"content{selected_option[-1]}"
-        self.switch_content(content_id)
+    is_locked = reactive(False)
 
-    def on_switch_changed(self, event: Switch.Changed) -> None:
-        """Event handler for the switch status change."""
-        self.update_lock_state(event.value)
+    def __init__(self):
+        super().__init__()
+        self.client = None
+
+    def on_mount(self) -> None:
+        self.push_screen("loading")
+        self.set_timer(2.5, self.load_main_screen)
+
+    async def on_load(self) -> None:
+        await self.init_client()
+
+    async def init_client(self) -> None:
+        cfg = SuiConfig.default_config()
+        self.client = AsyncClient(cfg)
+
+    def load_main_screen(self) -> None:
+        self.push_screen("main")
+
+    def on_screen_resume(self, event: events.ScreenResume) -> None:
+        if isinstance(event.screen, Mod_Screen):
+            self.query_one(RadioSet).focus()
 
     def action_toggle_lock(self) -> None:
-        """Action to toggle the lock state when 'l' is pressed."""
         safe_lock = self.query_one("#safe-lock", Switch)
         safe_lock.toggle()
-        self.update_lock_state(safe_lock.value)
+        self.is_locked = safe_lock.value
 
-    def update_lock_state(self, is_locked: bool) -> None:
-        """Updates the disabled state of the approve and decline buttons."""
-        approve_button = self.query_one("#approve", Button)
-        decline_button = self.query_one("#decline", Button)
-        approve_button.disabled = is_locked
-        decline_button.disabled = is_locked
+    def watch_is_locked(self, is_locked: bool) -> None:
+        if isinstance(self.screen, Mod_Screen):
+            self.screen.update_lock_state(is_locked)
+
+    def on_switch_changed(self, event: Switch.Changed) -> None:
+        if event.switch.id == "safe-lock":
+            self.is_locked = event.value
 
     def action_splash(self) -> None:
-        """Action to switch back to splash screen when 's' is pressed."""
-        self.switch_content("splash")
+        if isinstance(self.screen, Mod_Screen):
+            self.screen.action_splash()
 
-    def switch_content(self, content_id: str) -> None:
-        """Switch the content and update classes accordingly."""
-        content_switcher = self.query_one("#top-right", ContentSwitcher)
-        content_switcher.current = content_id
-        if content_id == "splash":
-            content_switcher.remove_class("markdown-view")
-        else:
-            content_switcher.add_class("markdown-view")
-    
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Handle button press events."""
-        if event.button.id == "approve":
-            self.notify("Submission approved!", title="Approval", severity="information")
-        elif event.button.id == "decline":
-            self.notify("Submission declined!", title="Decline", severity="error")
-        
-        # Clear the textarea
-        textarea = self.query_one("#void", TextArea)
-        textarea.clear()
-    
-# Entry Point
 if __name__ == "__main__":
     app = Pod_By_FrenSuipport()
     app.run()

@@ -1,23 +1,22 @@
 from textual.containers import Container, Vertical, Horizontal, VerticalScroll
-from textual.widgets import Switch, Button, Static, RadioSet, RadioButton, Collapsible, TextArea, Label, ListView, ListItem
+from textual.widgets import Switch, Button, RadioSet, RadioButton, Collapsible, TextArea, Label
 from textual.app import ComposeResult
+from custom_widgets import WalletList, NetworkEnvironmentWidget
 
 class LeftPanel(VerticalScroll):
+    
+    def __init__(self, client, **kwargs):
+        super().__init__(**kwargs)
+        self.client = client
+
     def compose(self) -> ComposeResult:
         self.border_title = ":: Wallet"
         
-        yield Static("::_TESTNET_::", id="network", classes="hatch cross_theme")
-
+        yield NetworkEnvironmentWidget(id="network", classes="hatch cross_theme")
+        
         with Container(id="wallet-container"):
-            wallet_list = ListView(
-                ListItem(Label("Ruby| 0x4685")),
-                ListItem(Label("sappaire| 0x123")),
-                ListItem(Label("sappaire| 0x123")),
-                id="wallet-list"
-            )
-            wallet_list.border_subtitle = ":: Addresses"
-            yield wallet_list
-
+            yield WalletList(self.client, id="wallet-list")
+        
         switches = Horizontal(id="switches")
         switches.border_subtitle = " :: Switches"
         with switches:
@@ -59,3 +58,9 @@ class BottomRight(Horizontal):
         with snippets:
             yield Button("Approved", id="approve", variant="primary", disabled=False)
             yield Button("Declined", id="decline", variant="error", disabled=False)
+    
+    def update_buttons_state(self, is_locked: bool) -> None:
+        approve_button = self.query_one("#approve", Button)
+        decline_button = self.query_one("#decline", Button)
+        approve_button.disabled = is_locked
+        decline_button.disabled = is_locked
