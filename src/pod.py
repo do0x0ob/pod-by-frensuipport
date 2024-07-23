@@ -1,44 +1,10 @@
-from textual.app import App, ComposeResult
-from textual.containers import Container, Center
+from textual.app import App
 from textual.binding import Binding
-from textual.widgets import Header, RadioSet, ContentSwitcher, Switch, Footer, Button, MarkdownViewer, TextArea, LoadingIndicator, Static
-from textual.screen import Screen
+from textual.widgets import Switch, RadioSet
+from textual.reactive import reactive
 from textual import events
-from render import Splash
-from panels import LeftPanel, BottomRight
-from files import MARKDOWN_CONTENT
 from pysui import SuiConfig, AsyncClient
-
-"""
-class LoadingScreen(Screen):
-    def compose(self) -> ComposeResult:
-        with Container(id="loading-container"):
-            yield Splash(id="loading-splash")
-"""
-
-class LoadingScreen(Screen):
-    def compose(self) -> ComposeResult:
-        with Center():
-            yield LoadingIndicator()
-            yield Static("Loading...", id="loading-text")
-
-class MainScreen(Screen):
-    def compose(self) -> ComposeResult:
-        yield Header(show_clock=True)
-        with Container(id="app-grid"):
-            yield LeftPanel(self.app.client, id="left-pane")
-            top_right = ContentSwitcher(initial="splash", id="top-right")
-            top_right.border_title = ":: Content"
-            with top_right:
-                yield Splash(id="splash")
-                for i in range(1, 4):
-                    yield MarkdownViewer(
-                        MARKDOWN_CONTENT[f"content{i}"],
-                        id=f"m{i}",  # 修改这里，使用 "m1", "m2", "m3" 作为 ID
-                        show_table_of_contents=False
-                    )
-            yield BottomRight(id="bottom-right")
-        yield Footer()
+from screens import LoadingScreen, Mod_Screen
 
 class Pod_By_FrenSuipport(App):
     CSS_PATH = "pod.tcss"
@@ -56,8 +22,10 @@ class Pod_By_FrenSuipport(App):
 
     SCREENS = {
         "loading": LoadingScreen,
-        "main": MainScreen
+        "main": Mod_Screen
     }
+
+    is_locked = reactive(False)
 
     def __init__(self):
         super().__init__()
@@ -78,42 +46,25 @@ class Pod_By_FrenSuipport(App):
         self.push_screen("main")
 
     def on_screen_resume(self, event: events.ScreenResume) -> None:
-        if isinstance(event.screen, MainScreen):
+        if isinstance(event.screen, Mod_Screen):
             self.query_one(RadioSet).focus()
 
     def action_toggle_lock(self) -> None:
         safe_lock = self.query_one("#safe-lock", Switch)
         safe_lock.toggle()
-        self.update_lock_state(safe_lock.value)
+        self.is_locked = safe_lock.value
 
-    def update_lock_state(self, is_locked: bool) -> None:
-        approve_button = self.query_one("#approve", Button)
-        decline_button = self.query_one("#decline", Button)
-        approve_button.disabled = is_locked
-        decline_button.disabled = is_locked
+    def watch_is_locked(self, is_locked: bool) -> None:
+        if isinstance(self.screen, Mod_Screen):
+            self.screen.update_lock_state(is_locked)
+
+    def on_switch_changed(self, event: Switch.Changed) -> None:
+        if event.switch.id == "safe-lock":
+            self.is_locked = event.value
 
     def action_splash(self) -> None:
-        self.switch_content("splash")
-
-    def switch_content(self, content_id: str) -> None:
-        content_switcher = self.query_one("#top-right", ContentSwitcher)
-        content_switcher.current = content_id
-        if content_id == "splash":
-            content_switcher.remove_class("markdown-view")
-        else:
-            content_switcher.add_class("markdown-view")
-
-    def on_radio_set_changed(self, event: RadioSet.Changed) -> None:
-        self.switch_content(event.pressed.id)
-
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "approve":
-            self.notify("Submission approved!", title="Approval", severity="information")
-        elif event.button.id == "decline":
-            self.notify("Submission declined!", title="Decline", severity="error")
-        
-        textarea = self.query_one("#void", TextArea)
-        textarea.clear()
+        if isinstance(self.screen, Mod_Screen):
+            self.screen.action_splash()
 
 if __name__ == "__main__":
     app = Pod_By_FrenSuipport()

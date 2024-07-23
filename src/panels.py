@@ -58,3 +58,9 @@ class BottomRight(Horizontal):
         with snippets:
             yield Button("Approved", id="approve", variant="primary", disabled=False)
             yield Button("Declined", id="decline", variant="error", disabled=False)
+    
+    def update_buttons_state(self, is_locked: bool) -> None:
+        approve_button = self.query_one("#approve", Button)
+        decline_button = self.query_one("#decline", Button)
+        approve_button.disabled = is_locked
+        decline_button.disabled = is_locked
