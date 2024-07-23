@@ -1,4 +1,4 @@
-from pysui import SuiConfig, SyncClient
+from pysui import SuiConfig, SyncClient, AsyncClient
 import os
 
 # 直接從 sui_constants 導入需要的常量
@@ -21,7 +21,7 @@ NETWORK_ENV_MAP = {
     MAINNET_SUI_URL: "mainnet"
 }
 
-def sui_addresses(client: SyncClient) -> None:
+def sui_addresses(client: AsyncClient) -> None:
     """Print all addresses."""
     _all_add: list = client.config.addresses
     _aliases = client.config.aliases
@@ -40,7 +40,7 @@ def main():
     cfg = SuiConfig.default_config()
     print(f"Using configuration from {os.environ.get(PYSUI_CLIENT_CONFIG_ENV, 'default location')}")
 
-    client = SyncClient(cfg)
+    client = AsyncClient(cfg)
     sui_addresses(client)
 
 if __name__ == "__main__":

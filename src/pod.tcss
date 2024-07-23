@@ -112,6 +112,14 @@
     border-title-color: #cc6666;
 }
 
+LoadingIndicator {
+    align: center middle;
+    color: #cc6666;
+}
+
+LoadingScreen {
+    align: center middle;
+}
 
 Switch:focus {
     border: blank;

@@ -1,7 +1,7 @@
 from textual.containers import Container, Vertical, Horizontal, VerticalScroll
-from textual.widgets import Switch, Button, Static, RadioSet, RadioButton, Collapsible, TextArea, Label, ListView, ListItem
+from textual.widgets import Switch, Button, RadioSet, RadioButton, Collapsible, TextArea, Label
 from textual.app import ComposeResult
-from custom_widgets import WalletList
+from custom_widgets import WalletList, NetworkEnvironmentWidget
 
 class LeftPanel(VerticalScroll):
     
@@ -12,7 +12,7 @@ class LeftPanel(VerticalScroll):
     def compose(self) -> ComposeResult:
         self.border_title = ":: Wallet"
         
-        yield Static("::_TESTNET_::", id="network", classes="hatch cross_theme")
+        yield NetworkEnvironmentWidget(id="network", classes="hatch cross_theme")
         
         with Container(id="wallet-container"):
             yield WalletList(self.client, id="wallet-list")
