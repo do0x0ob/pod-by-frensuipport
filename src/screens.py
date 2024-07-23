@@ -11,7 +11,6 @@ class LoadingScreen(Screen):
     def compose(self) -> ComposeResult:
         # yield LoadingIndicator()
         yield Static(welcome, classes="ascii_text")
-        #yield Static(submarine, classes="ascii_text")
 
 class Mod_Screen(Screen):
     def compose(self) -> ComposeResult:
