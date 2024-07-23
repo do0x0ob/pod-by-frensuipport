@@ -5,16 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.65.0] - Unpublished
+## [0.66.0] - Unpublished
 
 ### Added
 
-- SyncGqlClient and AsyncGqlClient to pysui package init as aliases
+- On PysuiConfiguration:
+  - `add_keys` adds a collection of keys and optional aliases
+  - `new_profile` creates equivalant of Sui CLI new-env
+  - `update_profile` updates profile values
+
+### Fixed
+
+- Coin deserialization failed when previousTransactionBlock has been pruned
+
+### Changed
+
+- Set version 0.66.0
+- Update PysuiConfiguration docs
+- Reorganized initiatlization of PysuiConfiguration and run time rebuilding from `client.yaml`
+
+### Removed
+
+
+## [0.65.0] - 2024-07-18
+
+**BREAKING CHANGES to GraphQL support**
+
+### Added
+
+- [PysuiConfiguration](https://pysui.readthedocs.io/en/latest/graphql_pyconfig.html)
 
 ### Fixed
 
 ### Changed
 
+- *BREAKING* SuiConfig is no longer used to instantiate a GraphQL client, instead
+  use PysuiConfiguration
+- Updated GraphQL client to use PysuiConfiguration
+- Updated GraphQL transaction builder to use PysuiConfiguration
+- Updated GraphQL samples to use PysuiConfiguration
+- Updated `walletg` and `async_gasg` to use PysuiConfiguration
+- PysuiConfiguration, SyncGqlClient and AsyncGqlClient as aliases in `pysui.__init__`
 - [change](https://github.com/FrankC01/pysui/issues/218) GraphQL remove SuiTransaction legacy dependency
 - Deprecated Event and Transaction subscriptions and subscription Client
 - Deprecate all Builders

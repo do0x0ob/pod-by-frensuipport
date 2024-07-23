@@ -6,9 +6,8 @@
 """Sample module for incremental buildout of Sui GraphQL RPC for Pysui 1.0.0."""
 
 import base64
-from pysui import SuiConfig, SuiRpcResult, SyncClient, SyncGqlClient
+from pysui import PysuiConfiguration, SuiRpcResult, SyncGqlClient
 from pysui.sui.sui_pgql.pgql_sync_txn import SuiTransaction
-from pysui.sui.sui_txn import SyncTransaction
 
 import pysui.sui.sui_pgql.pgql_query as qn
 import pysui.sui.sui_pgql.pgql_types as ptypes
@@ -41,7 +40,7 @@ def do_coins_for_type(client: SyncGqlClient):
     handle_result(
         client.execute_query_node(
             with_node=qn.GetCoins(
-                owner=client.config.active_address.address,
+                owner=client.config.active_address,
                 coin_type="0x2::sui::SUI",
             )
         )
@@ -52,7 +51,7 @@ def do_gas(client: SyncGqlClient):
     """Fetch 0x2::sui::SUI (default) for owner."""
     result = handle_result(
         client.execute_query_node(
-            with_node=qn.GetCoins(owner=client.config.active_address.address)
+            with_node=qn.GetCoins(owner=client.config.active_address)
         )
     )
     if result.is_ok():
@@ -65,7 +64,7 @@ def do_all_gas(client: SyncGqlClient):
     """Fetch all coins for owner."""
     result = handle_result(
         client.execute_query_node(
-            with_node=qn.GetCoins(owner=client.config.active_address.address)
+            with_node=qn.GetCoins(owner=client.config.active_address)
         )
     )
     tcoins = 0
@@ -78,7 +77,7 @@ def do_all_gas(client: SyncGqlClient):
             result = handle_result(
                 client.execute_query_node(
                     with_node=qn.GetCoins(
-                        owner=client.config.active_address.address,
+                        owner=client.config.active_address,
                         next_page=result.result_data.next_cursor,
                     )
                 )
@@ -95,7 +94,7 @@ def do_gas_ids(client: SyncGqlClient):
     # Use coins found for active address to use to validate
     # fetching by coin ids
     result = client.execute_query_node(
-        with_node=qn.GetCoins(owner=client.config.active_address.address)
+        with_node=qn.GetCoins(owner=client.config.active_address)
     )
     if result.is_ok() and result.result_data.data:
         cids = [x.coin_object_id for x in result.result_data.data]
@@ -121,14 +120,14 @@ def do_all_balances(client: SyncGqlClient):
     Demonstrates paging as well
     """
     result = client.execute_query_node(
-        with_node=qn.GetAllCoinBalances(owner=client.config.active_address.address)
+        with_node=qn.GetAllCoinBalances(owner=client.config.active_address)
     )
     handle_result(result)
     if result.is_ok():
         while result.result_data.next_cursor.hasNextPage:
             result = client.execute_query_node(
                 with_node=qn.GetAllCoinBalances(
-                    owner=client.config.active_address.address,
+                    owner=client.config.active_address,
                     next_page=result.result_data.next_cursor,
                 )
             )
@@ -185,9 +184,7 @@ def do_objects(client: SyncGqlClient):
     """Fetch all objects held by owner."""
     handle_result(
         client.execute_query_node(
-            with_node=qn.GetObjectsOwnedByAddress(
-                owner=client.config.active_address.address
-            )
+            with_node=qn.GetObjectsOwnedByAddress(owner=client.config.active_address)
         )
     )
 
@@ -331,7 +328,7 @@ def do_tx_kind(client: SyncGqlClient):
 
 def do_staked_sui(client: SyncGqlClient):
     """Retreive Staked Coins."""
-    owner = client.config.active_address.address
+    owner = client.config.active_address
 
     handle_result(
         client.execute_query_node(with_node=qn.GetDelegatedStakes(owner=owner))
@@ -402,7 +399,7 @@ def do_owned_nameservice(client: SyncGqlClient):
     """Fetch the most current system state summary."""
     handle_result(
         client.execute_query_node(
-            with_node=qn.GetNameServiceNames(owner=client.config.active_address.address)
+            with_node=qn.GetNameServiceNames(owner=client.config.active_address)
         )
     )
 
@@ -511,21 +508,6 @@ def do_package(client: SyncGqlClient):
             break
 
 
-def do_dry_run_kind(client: SyncGqlClient):
-    """Execute a dry run with TransactionKind where meta data is set by caller.
-
-    This uses the legacy SyncTransaction (JSON RPC based)
-    """
-    txer = SyncTransaction(client=SyncClient(client.config))
-    scres = txer.split_coin(coin=txer.gas, amounts=[1000000000])
-    txer.transfer_objects(transfers=scres, recipient=client.config.active_address)
-
-    tx_b64 = base64.b64encode(txer.raw_kind().serialize()).decode()
-    handle_result(
-        client.execute_query_node(with_node=qn.DryRunTransactionKind(tx_bytestr=tx_b64))
-    )
-
-
 def do_dry_run_kind_new(client: SyncGqlClient):
     """Execute a dry run with TransactionKind where meta data is set by caller.
 
@@ -534,28 +516,11 @@ def do_dry_run_kind_new(client: SyncGqlClient):
 
     txer = SuiTransaction(client=client)
     scres = txer.split_coin(coin=txer.gas, amounts=[1000000000])
-    txer.transfer_objects(
-        transfers=scres, recipient=client.config.active_address.address
-    )
+    txer.transfer_objects(transfers=scres, recipient=client.config.active_address)
 
     tx_b64 = base64.b64encode(txer.raw_kind().serialize()).decode()
     handle_result(
         client.execute_query_node(with_node=qn.DryRunTransactionKind(tx_bytestr=tx_b64))
-    )
-
-
-def do_dry_run(client: SyncGqlClient):
-    """Execute a dry run with TransactionData where gas and budget set by txer.
-
-    This uses the legacy SyncTransaction (JSON RPC based)
-    """
-    txer = SyncTransaction(client=SyncClient(client.config))
-    scres = txer.split_coin(coin=txer.gas, amounts=[1000000000])
-    txer.transfer_objects(transfers=scres, recipient=client.config.active_address)
-
-    tx_b64 = base64.b64encode(txer.get_transaction_data().serialize()).decode()
-    handle_result(
-        client.execute_query_node(with_node=qn.DryRunTransaction(tx_bytestr=tx_b64))
     )
 
 
@@ -566,38 +531,13 @@ def do_dry_run_new(client: SyncGqlClient):
     """
     txer = SuiTransaction(client=client)
     scres = txer.split_coin(coin=txer.gas, amounts=[1000000000])
-    txer.transfer_objects(
-        transfers=scres, recipient=client.config.active_address.address
-    )
+    txer.transfer_objects(transfers=scres, recipient=client.config.active_address)
 
     tx_b64 = base64.b64encode(txer.transaction_data().serialize()).decode()
     print(tx_b64)
     handle_result(
         client.execute_query_node(with_node=qn.DryRunTransaction(tx_bytestr=tx_b64))
     )
-
-
-def do_execute(client: SyncGqlClient):
-    """Execute a transaction.
-
-    The result contains the digest of the transaction which can then be queried
-    for details
-
-    This uses the legacy SyncTransaction (JSON RPC based)
-    """
-    if client.chain_environment == "testnet":
-        rpc_client = SyncClient(client.config)
-        txer = SyncTransaction(client=rpc_client)
-        scres = txer.split_coin(coin=txer.gas, amounts=[1000000000])
-        txer.transfer_objects(transfers=scres, recipient=client.config.active_address)
-        tx_b64 = txer.deferred_execution(run_verification=True)
-        sig_array = txer.signer_block.get_signatures(client=rpc_client, tx_bytes=tx_b64)
-        rsig_array = [x.value for x in sig_array.array]
-        handle_result(
-            client.execute_query_node(
-                with_node=qn.ExecuteTransaction(tx_bytestr=tx_b64, sig_array=rsig_array)
-            )
-        )
 
 
 def do_execute_new(client: SyncGqlClient):
@@ -610,9 +550,7 @@ def do_execute_new(client: SyncGqlClient):
     """
     txer: SuiTransaction = SuiTransaction(client=client)
     scres = txer.split_coin(coin=txer.gas, amounts=[1000000000])
-    txer.transfer_objects(
-        transfers=scres, recipient=client.config.active_address.address
-    )
+    txer.transfer_objects(transfers=scres, recipient=client.config.active_address)
     txdict = txer.build_and_sign()
     handle_result(client.execute_query_node(with_node=qn.ExecuteTransaction(**txdict)))
 
@@ -625,7 +563,7 @@ def merge_some(client: SyncGqlClient):
     """
 
     result = client.execute_query_node(
-        with_node=qn.GetCoins(owner=client.config.active_address.address)
+        with_node=qn.GetCoins(owner=client.config.active_address)
     )
     if result.is_ok() and len(result.result_data.data) > 1:
         txer: SuiTransaction = SuiTransaction(client=client)
@@ -644,15 +582,13 @@ def split_1_half(client: SyncGqlClient):
     """
 
     result = client.execute_query_node(
-        with_node=qn.GetCoins(owner=client.config.active_address.address)
+        with_node=qn.GetCoins(owner=client.config.active_address)
     )
     if result.is_ok() and len(result.result_data.data) == 1:
         amount = int(int(result.result_data.data[0].balance) / 2)
         txer: SuiTransaction = SuiTransaction(client=client)
         scres = txer.split_coin(coin=txer.gas, amounts=[amount])
-        txer.transfer_objects(
-            transfers=scres, recipient=client.config.active_address.address
-        )
+        txer.transfer_objects(transfers=scres, recipient=client.config.active_address)
         txdict = txer.build_and_sign()
         handle_result(
             client.execute_query_node(with_node=qn.ExecuteTransaction(**txdict))
@@ -692,7 +628,7 @@ def do_stake(client: SyncGqlClient):
 def do_unstake(client: SyncGqlClient):
     """Unstake first Staked Sui if address has any."""
 
-    owner = client.config.active_address.address
+    owner = client.config.active_address
     result = client.execute_query_node(with_node=qn.GetDelegatedStakes(owner=owner))
     if result.is_ok() and result.result_data.staked_coins:
         txer: SuiTransaction = SuiTransaction(client=client)
@@ -717,10 +653,13 @@ def do_unstake(client: SyncGqlClient):
 
 if __name__ == "__main__":
 
-    cfg = SuiConfig.default_config()
+    #
+    cfg = PysuiConfiguration(
+        group_name=PysuiConfiguration.SUI_GQL_RPC_GROUP  # , profile_name="testnet"
+    )
     client_init = SyncGqlClient(
         write_schema=False,
-        config=cfg,
+        pysui_config=cfg,
     )
     print(f"Chain environment   '{client_init.chain_environment}'")
     print(f"Default schema base version '{client_init.base_schema_version}'")
@@ -762,11 +701,8 @@ if __name__ == "__main__":
         # do_funcs(client_init)
         # do_module(client_init)
         # do_package(client_init)
-        # do_dry_run(client_init)
         # do_dry_run_new(client_init)
         # do_dry_run_kind_new(client_init)
-        # do_dry_run_kind(client_init)
-        # do_execute(client_init)
         # do_execute_new(client_init)
         # merge_some(client_init)
         # split_1_half(client_init)
