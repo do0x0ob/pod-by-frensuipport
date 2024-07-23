@@ -1,16 +1,17 @@
 from textual.screen import Screen
-from textual.containers import Container, Center
+from textual.containers import Container
 from textual.widgets import Header, RadioSet, ContentSwitcher, Footer, Button, MarkdownViewer, TextArea, LoadingIndicator, Static
 from textual.app import ComposeResult
+from ascii_art import welcome
 from render import Splash
 from panels import LeftPanel, BottomRight
 from files import MARKDOWN_CONTENT
 
 class LoadingScreen(Screen):
     def compose(self) -> ComposeResult:
-        with Center():
-            yield LoadingIndicator()
-            yield Static("Loading...", id="loading-text")
+        # yield LoadingIndicator()
+        yield Static(welcome, classes="ascii_text")
+        #yield Static(submarine, classes="ascii_text")
 
 class Mod_Screen(Screen):
     def compose(self) -> ComposeResult:
