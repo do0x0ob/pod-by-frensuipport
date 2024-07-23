@@ -5,6 +5,7 @@ from textual.widgets import Header, RadioSet, ContentSwitcher, Switch, Footer, B
 from render import Splash
 from panels import LeftPanel, BottomRight
 from files import MARKDOWN_CONTENT
+from pysui import SuiConfig, SyncClient
 
 class Pod_By_FrenSuipport(App):
     CSS_PATH = "pod.tcss"
@@ -20,10 +21,15 @@ class Pod_By_FrenSuipport(App):
         )
     ]
 
+    def __init__(self):
+        super().__init__()
+        cfg = SuiConfig.default_config()
+        self.client = SyncClient(cfg)
+
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
         with Container(id="app-grid"):
-            yield LeftPanel(id="left-pane")
+            yield LeftPanel(self.client, id="left-pane")
             top_right = ContentSwitcher(initial="splash", id="top-right")
             top_right.border_title = ":: Content"
             with top_right:

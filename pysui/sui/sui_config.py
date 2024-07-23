@@ -14,7 +14,6 @@
 
 """Default Sui Configuration."""
 
-
 import os
 import logging
 import base64
