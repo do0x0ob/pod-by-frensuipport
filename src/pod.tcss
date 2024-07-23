@@ -1,0 +1,176 @@
+#app-grid {
+    layout: grid;
+    grid-size: 5 5;
+    grid-columns: 1fr 1fr 1fr 1fr 1fr;
+    grid-rows: 1fr 1fr 1fr 1fr 1fr;
+    grid-gutter: 0 1;
+    margin: 1 2;
+}
+
+#left-pane {
+    width: 100%;
+    height: 100%;
+    column-span: 1;
+    row-span: 5;
+    border: double #cc6666;
+}
+
+#network {
+    text-align: center;
+    width: 1fr;
+    border: round #cc6666;
+    color: #cc6666;
+    text-style: bold italic reverse;
+}
+
+#switches {
+    layout: grid;
+    grid-size: 2;
+    grid-columns: 1fr 1fr;
+    border: round #cc6666;
+    height: auto;
+}
+
+#top-right {
+    width: 100%;
+    height: 100%;
+    column-span: 4;
+    row-span: 4;
+    border: inner $panel;
+    /*border: double #cc6666;*/
+    margin: 0;
+    padding: 0;
+}
+
+#top-right.markdown-view {
+    border: double #cc6666;
+}
+
+#bottom-right {
+    width: 100%;
+    height: 100%;
+    column-span: 4;
+    row-span: 1;
+    layout: grid;
+    grid-size: 4;
+    grid-columns: 1fr;
+    grid-rows: 1fr;
+    grid-gutter: 1;
+    min-height: 20%;
+    border: double #cc6666;
+}
+
+#void {
+    column-span: 3;
+    padding: 0 1;
+}
+
+#snippets {
+    column-span: 1;
+    margin: 0 1;
+    height: 1fr;
+    align: center middle;
+    border: inner $panel-lighten-3;
+    border-title-align: center;
+    border-title-color: #cc6666;
+    border-title-style: bold;
+    border-title-background: $panel-lighten-3;
+}
+
+#wallet-container {
+    height: auto;
+    scrollbar-color-hover: #0099cc;
+    scrollbar-color-active: #cc6666;
+    scrollbar-size-vertical: 1;
+}
+
+#wallet-content {
+    padding: 1 0 0 0;
+    text-align: center;
+    border: round #cc6666;
+    scrollbar-color: #cc6666;
+    scrollbar-color-hover: #0099cc;
+    scrollbar-color-active: #cc6666;
+    scrollbar-size-vertical: 1;
+}
+
+#wallet-list > Contents {
+    padding: 1 0 0 0;
+}
+
+#wallet-list {
+    border: round #cc6666;
+    height: auto;
+}
+
+
+#top-right .render_splash {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border-title-color: #cc6666;
+}
+
+
+Switch:focus {
+    border: blank;
+}
+
+Horizontal > Static {
+    border: blank;
+    text-align: center;
+}
+
+ListView > ListItem.--highlight {
+    background: #0099cc;
+}
+
+TextArea {
+    &:focus {
+        border: blank #cc6666 50%;
+    }
+}
+
+Collapsible {
+    height: auto;
+    border-top: blank;
+    padding-bottom: 0;
+    padding-left: 0;
+}
+
+CollapsibleTitle:focus {
+    background: #cc6666;
+    color: $text;
+}
+
+RadioSet:focus {
+    border: blank;
+}
+
+Toast {
+    padding: 1 1;
+    outline: panel $panel;
+    width: auto;
+    background: $panel-lighten-1;
+}
+
+ToastRack {
+    align: center top;
+}
+
+.switch_container {
+    height: auto;
+    width: 100%;
+    align: center middle;
+}
+
+
+.hatch {
+    &.cross_theme {
+        hatch: cross #cc6666 80%;
+    }
+    &.cross {
+        hatch: cross $panel-lighten-1;
+    }
+}

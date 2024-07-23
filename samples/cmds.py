@@ -13,6 +13,7 @@
 
 
 """Commands and dispath dict."""
+import time
 import argparse
 import sys
 from typing import Union, Any
@@ -79,14 +80,18 @@ def sui_active_address(client: SyncClient, _args: argparse.Namespace) -> None:
 
 def sui_addresses(client: SyncClient, _args: argparse.Namespace) -> None:
     """Print all address."""
+    print(f"Debug: Entering sui_addresses function at {time.time()}")
+    print(f"Debug: Client config: {client.config}")
+    print(f"Debug: Number of addresses: {len(client.config.addresses)}")
     print()
     print("Addresses")
     print("---------")
     for addy in client.config.addresses:
         if addy == client.config.active_address:
-            print(f"{addy} <-- active")
+            print(f"{addy} <-- active!")
         else:
             print(addy)
+    print(f"Debug: Exiting sui_addresses function at {time.time()}")
 
 
 def sui_gas(client: SyncClient, args: argparse.Namespace) -> None:

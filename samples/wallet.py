@@ -18,18 +18,18 @@ import os
 import pathlib
 import sys
 
+from pysui import SuiConfig, SyncClient
+from pysui.sui.sui_constants import PYSUI_CLIENT_CONFIG_ENV
+
+from samples.cmd_args import build_parser
+from samples.cmds import SUI_CMD_DISPATCH
+
 PROJECT_DIR = pathlib.Path(os.path.dirname(__file__))
 PARENT = PROJECT_DIR.parent
 
 sys.path.insert(0, str(PROJECT_DIR))
 sys.path.insert(0, str(PARENT))
 sys.path.insert(0, str(os.path.join(PARENT, "pysui")))
-
-from pysui import SuiConfig, SyncClient
-from pysui.sui.sui_constants import PYSUI_CLIENT_CONFIG_ENV
-
-from samples.cmd_args import build_parser
-from samples.cmds import SUI_CMD_DISPATCH
 
 
 def main():
@@ -47,7 +47,7 @@ def main():
         var_args.pop("subcommand")
         parsed = argparse.Namespace(**var_args)
         if cfg_local:
-            print(f"Using configuration from suibase localnet")
+            print("Using configuration from suibase localnet")
             cfg = SuiConfig.sui_base_config()
         else:
             cfg = SuiConfig.default_config()
