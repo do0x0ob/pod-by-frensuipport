@@ -13,6 +13,8 @@ from pysui.sui.sui_constants import (
 )
 import os
 import asyncio
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 # 創建 URL 到環境名稱的映射
 NETWORK_ENV_MAP = {
@@ -65,12 +67,15 @@ async def get_objects(client: AsyncClient, address: SuiAddress = None, object_ty
                 if content and hasattr(content, 'fields'):
                     if 'content' in content.fields:
                         print(f"  Content: {content.fields['content']}")
+                    """
                     if 'task_description' in content.fields:
                         task_desc = content.fields['task_description']
                         if isinstance(task_desc, dict) and 'fields' in task_desc:
                             print(f"  Task Description: {task_desc['fields'].get('description', 'N/A')}")
-                    print(f"  Created Time: {content.fields.get('created_time', 'N/A')}")
-                    print(f"  Update Time: {content.fields.get('update_time', 'N/A')}")
+                    """
+                    #print(f"  Created Time: {content.fields.get('created_time', 'N/A')}")
+                    #print(f"  Update Time: {content.fields.get('update_time', 'N/A')}")
+                    print(f"  Status: {content.fields.get('status', 'N/A')}")
                 else:
                     print("  Content: Not available")
             else:

@@ -21,8 +21,9 @@ class LeftPanel(VerticalScroll):
         switches.border_subtitle = " :: Switches"
         with switches:
             with Vertical(classes="switch_container"):
-                yield Label("MOD", id="center")
-                yield Switch(id="mod-switch", disabled=True)
+                yield Label("REFETCH", id="center")
+                #yield Switch(id="refetch", animate=False)
+                yield Button("F5",id="refetch")
             with Vertical(classes="switch_container"):
                 yield Label("LOCK", id="center")
                 yield Switch(id="safe-lock")

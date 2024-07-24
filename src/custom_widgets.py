@@ -1,4 +1,5 @@
 from textual.widgets import ListView, ListItem, Label, Static
+from textual.containers import Vertical, VerticalScroll
 from pysui import SuiConfig, SyncClient, AsyncClient
 from pysui.sui.sui_constants import (
     DEVNET_SUI_URL,
@@ -28,6 +29,7 @@ class NetworkEnvironmentWidget(Static):
         cur_url = client.config.rpc_url
         current_env = NETWORK_ENV_MAP.get(cur_url, "UNKNOWN").upper()
         self.update(f"::{current_env}::")
+
 
 class WalletList(ListView):
     def __init__(self, client, **kwargs):

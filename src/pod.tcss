@@ -31,6 +31,23 @@
     height: auto;
 }
 
+#refetch {
+    min-width: 8;
+    outline: thick $panel;
+    background: #cc6666;
+
+    &:focus {
+            text-style: none;
+        }
+
+    &.-active {
+            background: $panel;
+            border-bottom: thick $panel-lighten-2;
+            border-top: thick $panel-darken-2;
+            tint: #cc6666 10%;
+        }
+}
+
 #top-right {
     width: 100%;
     height: 100%;
