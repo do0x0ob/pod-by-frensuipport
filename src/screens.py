@@ -1,6 +1,6 @@
 from textual.screen import Screen
 from textual.containers import Container
-from textual.widgets import Header, RadioSet, ContentSwitcher, Footer, Button, MarkdownViewer, TextArea, LoadingIndicator, Static
+from textual.widgets import Header, RadioButton, ContentSwitcher, Footer, Button, MarkdownViewer, TextArea, LoadingIndicator, Static
 from textual.app import ComposeResult
 from ascii_art import welcome
 from render import Splash
@@ -45,8 +45,8 @@ class Mod_Screen(Screen):
         else:
             content_switcher.add_class("markdown-view")
     
-    def on_radio_set_changed(self, event: RadioSet.Changed) -> None:
-        self.switch_content(event.pressed.id)
+    def on_radio_button_changed(self, event: RadioButton.Changed) -> None:
+        self.switch_content(event.control.id)
     
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "approve":

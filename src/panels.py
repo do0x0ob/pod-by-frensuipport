@@ -29,24 +29,15 @@ class LeftPanel(VerticalScroll):
 
         task_sheets = VerticalScroll(id="wallet-content")
         task_sheets.border_subtitle = ":: Submissions"
+        
         with task_sheets:
             with Collapsible(id="task1", title="Greatest Coffee Maker Ever"):
-                with RadioSet(id="focus_me"):
-                    yield RadioButton("0x...5412542154125421", id="m1")
-                    yield RadioButton("0x...5412542154125421", id="m2")
-                    yield RadioButton("0x...5412542154125421", id="m3")
+                yield RadioButton("0x...5412542154125421", id="m1")
             with Collapsible(id="task2", title="Learn Sui Move"):
-                with RadioSet(id="focus_me2"):
-                    yield RadioButton("0x...5412542154125421", id="m4")
-                    yield RadioButton("0x...5412542154125421", id="m5")
-                    yield RadioButton("0x...5412542154125421", id="m6")
+                yield RadioButton("0x...5412542154125421", id="m2")
             with Collapsible(id="task3", title="Home Brew Beer"):
-                with RadioSet(id="focus_me3"):
-                    yield RadioButton("0x...5412542154125421", id="m7")
-                    yield RadioButton("0x...5412542154125421", id="m8")
-                    yield RadioButton("0x...5412542154125421", id="m9")
+                yield RadioButton("0x...5412542154125421", id="m3")
         
-
 class BottomRight(Horizontal):
     def compose(self) -> ComposeResult:
         self.border_title = ":: Annotations"
