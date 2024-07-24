@@ -73,14 +73,12 @@ async def get_objects(client: AsyncClient, address: SuiAddress = None, object_ty
                         if isinstance(task_desc, dict) and 'fields' in task_desc:
                             print(f"  Task Description: {task_desc['fields'].get('description', 'N/A')}")
                     """
-                    #print(f"  Created Time: {content.fields.get('created_time', 'N/A')}")
-                    #print(f"  Update Time: {content.fields.get('update_time', 'N/A')}")
                     print(f"  Status: {content.fields.get('status', 'N/A')}")
                 else:
                     print("  Content: Not available")
             else:
                 print(f"  Error fetching object details: {object_read.result_string}")
-            print()  # 添加空行以分隔不同對象
+            print()
     else:
         print(f"Error: {result.result_string}")
 

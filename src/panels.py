@@ -18,7 +18,7 @@ class LeftPanel(VerticalScroll):
             yield WalletList(self.client, id="wallet-list")
         
         switches = Horizontal(id="switches")
-        switches.border_subtitle = " :: Switches"
+        switches.border_subtitle = " :: Functions"
         with switches:
             with Vertical(classes="switch_container"):
                 yield Label("REFETCH", id="center")

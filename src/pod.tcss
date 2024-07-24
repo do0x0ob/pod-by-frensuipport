@@ -37,7 +37,7 @@
     background: #cc6666;
 
     &:focus {
-            text-style: none;
+            text-style: bold;
         }
 
     &.-active {

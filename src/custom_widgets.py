@@ -46,7 +46,7 @@ class WalletList(ListView):
         active_address = self.client.config.active_address
 
         for address, alias in zip(addresses, aliases):
-            short_address = f"{address[:4]}...{address[-4:]}"
+            short_address = f"{address[:2]}..{address[-4:]}"
             label_text = f"{alias}|{short_address}"
             if address == active_address:
                 label_text += "*"
