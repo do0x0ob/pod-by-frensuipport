@@ -1,7 +1,7 @@
 from textual.app import ComposeResult
 from textual.widgets import ListView, ListItem, Label, Static, Button, Switch, ContentSwitcher, OptionList
 from textual.widgets.option_list import Option
-from textual.containers import Vertical, Horizontal, Container, VerticalScroll
+from textual.containers import Vertical, Horizontal, Container, VerticalScroll, Center
 from textual.reactive import reactive
 from textual.message import Message
 from pysui import SuiConfig, AsyncClient
@@ -100,7 +100,10 @@ class WalletContent(Container):
 
         wallet_content.mount(
             Vertical(
-                Static("Cool Task", classes="taskname"),
+                Container(
+                    Static("Python Alien Language Translator", classes="taskname"),
+                    classes="task_container"
+                ),
                 OptionList(
                     Option("0x...5412542154125421", id="m1"),
                     Option("0x...5412542154125422", id="m3"),

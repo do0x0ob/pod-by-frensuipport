@@ -119,19 +119,19 @@
 }
 
 .main_task_group {
-    /* TODO: delete border: ascii #cc6666;*/
     padding: 0 1;
     height: auto;
     margin-bottom: 1;
 }
 
 #wallet-list > Contents {
-    padding: 1 0 0 0;
+    padding: 1 1 0 0;
 }
 
 #wallet-list {
     border: round #cc6666;
     height: auto;
+    padding: 0 1;
 }
 
 #top-right .render_splash {
@@ -160,7 +160,7 @@ Horizontal > Static {
 }
 
 ListView > ListItem.--highlight {
-    background: #0099cc;
+    background: #cc6666 80%;
 }
 
 TextArea {
@@ -198,8 +198,8 @@ ToastRack {
 
 OptionList {
         background: transparent;
-        border: tall transparent;
-        padding: 0 1;
+        border: transparent;
+        padding: 0;
     }
 
 OptionList:focus {
@@ -207,7 +207,7 @@ OptionList:focus {
 }
 
 OptionList:focus > .option-list--option-highlighted {
-        background: #cc6666;
+        background: #cc6666 80%;
 }
 
 .switch_container {
@@ -217,16 +217,28 @@ OptionList:focus > .option-list--option-highlighted {
 }
 
 .taskname {
+    width: 100%;
     padding: 0 1;
+    border: ascii #cc6666;
+    color: #cc6666;
+    text-style: bold italic underline;
+}
+
+.task_container {
+    width: 100%;
+    height: 3;
 }
 
 
 .hatch {
     &.cross_theme {
-        hatch: cross #cc6666 80%;
+        hatch: cross #cc6666 60%;
     }
     &.cross {
         hatch: cross $panel-lighten-1;
+    }
+    &.right {
+        hatch: right #cc6666 50%
     }
 }
 
