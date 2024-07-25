@@ -82,13 +82,6 @@ class WalletContent(Container):
     def on_mount(self) -> None:
         self.load_wallet_content()
 
-    # TODO: move to panel layer to function
-    """
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        if event.button.id == "refetch":
-            self.load_wallet_content()
-    """
-
     def load_wallet_content(self) -> None:
         self.is_loading = True
         self.query_one(ContentSwitcher).current = "loading"
@@ -106,13 +99,6 @@ class WalletContent(Container):
         
         self.is_loading = False
         self.query_one(ContentSwitcher).current = "wallet-content"
-
-    # TODO: move to panel layer to function
-    """
-    def watch_is_loading(self, is_loading: bool) -> None:
-        refetch_button = self.query_one("#refetch", Button)
-        refetch_button.disabled = is_loading
-    """
 
 class PanelController:
     def __init__(self, panel):
