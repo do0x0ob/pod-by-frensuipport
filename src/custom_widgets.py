@@ -113,3 +113,19 @@ class WalletContent(Container):
         refetch_button = self.query_one("#refetch", Button)
         refetch_button.disabled = is_loading
     """
+
+class PanelController:
+    def __init__(self, panel):
+        self.panel = panel
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "refetch":
+            self.reload_wallet_content()
+
+    def reload_wallet_content(self) -> None:
+        wallet_content = self.panel.query_one(WalletContent)
+        wallet_content.load_wallet_content()
+
+    def watch_is_loading(self, is_loading: bool) -> None:
+        refetch_button = self.panel.query_one("#refetch", Button)
+        refetch_button.disabled = is_loading
