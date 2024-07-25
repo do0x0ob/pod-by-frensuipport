@@ -12,6 +12,7 @@ class Pod_By_FrenSuipport(App):
         Binding(key="q", action="quit", description="Quit the app"),
         Binding(key="l", action="toggle_lock", description="Lock the Screen"),
         Binding(key="s", action="splash", description="Splash!"),
+        Binding(key="f5", action="refresh", description="Refresh wallet content"),
         Binding(
             key="question_mark",
             action="help",
@@ -65,6 +66,12 @@ class Pod_By_FrenSuipport(App):
     def action_splash(self) -> None:
         if isinstance(self.screen, Mod_Screen):
             self.screen.action_splash()
+    
+    def action_refresh(self) -> None:
+        if isinstance(self.screen, Mod_Screen):
+            wallet_content = self.screen.query_one("WalletContent")
+            if wallet_content:
+                wallet_content.load_wallet_content()
 
 if __name__ == "__main__":
     app = Pod_By_FrenSuipport()
