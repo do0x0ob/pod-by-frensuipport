@@ -1,5 +1,5 @@
 from textual.app import ComposeResult
-from textual.widgets import ListView, ListItem, Label, Static, Button, Switch, ContentSwitcher, LoadingIndicator, Collapsible, RadioButton
+from textual.widgets import ListView, ListItem, Label, Static, Button, Switch, ContentSwitcher, Collapsible, RadioButton
 from textual.containers import Vertical, Horizontal, Container, VerticalScroll
 from textual.reactive import reactive
 from pysui import SuiConfig, AsyncClient
