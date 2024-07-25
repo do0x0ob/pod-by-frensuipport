@@ -1,5 +1,5 @@
 from textual.containers import Container, Horizontal, VerticalScroll
-from textual.widgets import Button, RadioButton, Collapsible, TextArea
+from textual.widgets import Button, TextArea
 from textual.app import ComposeResult
 from custom_widgets import WalletList, NetworkEnvironmentWidget, FunctionSwitches, WalletContent
 
@@ -16,19 +16,6 @@ class LeftPanel(VerticalScroll):
             yield WalletList(self.client, id="wallet-list")
         yield FunctionSwitches()
         yield WalletContent()
-
-        """
-        task_sheets = VerticalScroll(id="wallet-content")
-        task_sheets.border_subtitle = ":: Submissions"
-        
-        with task_sheets:
-            with Collapsible(id="task1", title="Greatest Coffee Maker Ever"):
-                yield RadioButton("0x...5412542154125421", id="m1")
-            with Collapsible(id="task2", title="Learn Sui Move"):
-                yield RadioButton("0x...5412542154125421", id="m2")
-            with Collapsible(id="task3", title="Home Brew Beer"):
-                yield RadioButton("0x...5412542154125421", id="m3")
-        """
         
 class BottomRight(Horizontal):
     def compose(self) -> ComposeResult:

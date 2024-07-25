@@ -80,10 +80,10 @@ class WalletContent(Container):
             yield VerticalScroll(id="wallet-content")
 
     def on_mount(self) -> None:
-        #self.query_one("#wallet-content").border_subtitle = ":: Submissions"
         self.load_wallet_content()
 
-    """ TODO: move to panel layer to function
+    # TODO: move to panel layer to function
+    """
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "refetch":
             self.load_wallet_content()
@@ -107,7 +107,8 @@ class WalletContent(Container):
         self.is_loading = False
         self.query_one(ContentSwitcher).current = "wallet-content"
 
-    """ TODO: move to panel layer to function
+    # TODO: move to panel layer to function
+    """
     def watch_is_loading(self, is_loading: bool) -> None:
         refetch_button = self.query_one("#refetch", Button)
         refetch_button.disabled = is_loading
