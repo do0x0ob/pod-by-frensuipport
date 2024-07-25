@@ -1,7 +1,9 @@
 from textual.app import ComposeResult
-from textual.widgets import ListView, ListItem, Label, Static, Button, Switch, ContentSwitcher, Collapsible, RadioButton
+from textual.widgets import ListView, ListItem, Label, Static, Button, Switch, ContentSwitcher, OptionList
+from textual.widgets.option_list import Option
 from textual.containers import Vertical, Horizontal, Container, VerticalScroll
 from textual.reactive import reactive
+from textual.message import Message
 from pysui import SuiConfig, AsyncClient
 from pysui.sui.sui_constants import (
     DEVNET_SUI_URL,
@@ -71,6 +73,11 @@ class FunctionSwitches(Horizontal):
 class WalletContent(Container):
     is_loading = reactive(True)
 
+    class OptionSelected(Message):
+        def __init__(self, option_id: str):
+            self.option_id = option_id
+            super().__init__()
+    
     def compose(self) -> ComposeResult:
         #yield Button("Refresh Wallet", id="refresh-button", variant="primary")
         submissions = ContentSwitcher(initial="loading", id="submissions")
@@ -85,20 +92,37 @@ class WalletContent(Container):
     def load_wallet_content(self) -> None:
         self.is_loading = True
         self.query_one(ContentSwitcher).current = "loading"
-        
-        # 使用 set_timer 来模拟异步加载
         self.set_timer(2, self._finish_loading)
 
     def _finish_loading(self) -> None:
         wallet_content = self.query_one("#wallet-content")
         wallet_content.remove_children()
-        
-        wallet_content.mount(Collapsible(RadioButton("0x...5412542154125421", id="m1"), title="Greatest Coffee Maker Ever"))
-        wallet_content.mount(Collapsible(RadioButton("0x...5412542154125421", id="m2"), title="Learn Sui Move"))
-        wallet_content.mount(Collapsible(RadioButton("0x...5412542154125421", id="m3"), title="Home Brew Beer"))
-        
+
+        wallet_content.mount(
+            Vertical(
+                Static("Cool Task", classes="taskname"),
+                OptionList(
+                    Option("0x...5412542154125421", id="m1"),
+                    Option("0x...5412542154125422", id="m3"),
+                ),
+                classes="main_task_group"
+            )
+        )
+        wallet_content.mount(
+            Vertical(
+                Static("Good Task", classes="taskname"),
+                OptionList(
+                    Option("0x...5412542154125423", id="m2"),
+                ),
+                classes="main_task_group"
+            )
+        )
+
         self.is_loading = False
         self.query_one(ContentSwitcher).current = "wallet-content"
+    
+    def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
+        self.post_message(self.OptionSelected(event.option.id))
 
 class PanelController:
     def __init__(self, panel):

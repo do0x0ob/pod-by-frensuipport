@@ -1,11 +1,12 @@
 from textual.screen import Screen
 from textual.containers import Container
-from textual.widgets import Header, RadioButton, ContentSwitcher, Footer, Button, MarkdownViewer, TextArea, LoadingIndicator, Static
+from textual.widgets import Header, ContentSwitcher, Footer, Button, MarkdownViewer, TextArea, Static
 from textual.app import ComposeResult
 from ascii_art import welcome
 from render import Splash
 from panels import LeftPanel, BottomRight
 from files import MARKDOWN_CONTENT
+from custom_widgets import WalletContent
 
 class LoadingScreen(Screen):
     def compose(self) -> ComposeResult:
@@ -44,9 +45,9 @@ class Mod_Screen(Screen):
             content_switcher.remove_class("markdown-view")
         else:
             content_switcher.add_class("markdown-view")
-    
-    def on_radio_button_changed(self, event: RadioButton.Changed) -> None:
-        self.switch_content(event.control.id)
+
+    def on_wallet_content_option_selected(self, event: WalletContent.OptionSelected) -> None:
+        self.switch_content(event.option_id)
     
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "approve":
