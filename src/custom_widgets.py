@@ -1,6 +1,7 @@
-from textual.widgets import ListView, ListItem, Label, Static
-from textual.containers import Vertical, VerticalScroll
-from pysui import SuiConfig, SyncClient, AsyncClient
+from textual.app import ComposeResult
+from textual.widgets import ListView, ListItem, Label, Static, Button, Switch
+from textual.containers import Vertical, Horizontal
+from pysui import SuiConfig, AsyncClient
 from pysui.sui.sui_constants import (
     DEVNET_SUI_URL,
     LOCALNET_SUI_URL,
@@ -51,3 +52,17 @@ class WalletList(ListView):
             if address == active_address:
                 label_text += "*"
             self.append(ListItem(Label(label_text)))
+
+
+class FunctionSwitches(Horizontal):
+    def __init__(self, **kwargs):
+        super().__init__(id="switches", **kwargs)
+        self.border_subtitle = " :: Functions"
+
+    def compose(self) -> ComposeResult:
+        with Vertical(classes="switch_container"):
+            yield Label("REFETCH", id="center")
+            yield Button("F5", id="refetch")
+        with Vertical(classes="switch_container"):
+            yield Label("LOCK", id="center")
+            yield Switch(id="safe-lock")

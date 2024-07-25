@@ -1,10 +1,9 @@
-from textual.containers import Container, Vertical, Horizontal, VerticalScroll
-from textual.widgets import Switch, Button, RadioSet, RadioButton, Collapsible, TextArea, Label
+from textual.containers import Container, Horizontal, VerticalScroll
+from textual.widgets import Button, RadioButton, Collapsible, TextArea
 from textual.app import ComposeResult
-from custom_widgets import WalletList, NetworkEnvironmentWidget
+from custom_widgets import WalletList, NetworkEnvironmentWidget, FunctionSwitches
 
 class LeftPanel(VerticalScroll):
-    
     def __init__(self, client, **kwargs):
         super().__init__(**kwargs)
         self.client = client
@@ -13,20 +12,9 @@ class LeftPanel(VerticalScroll):
         self.border_title = ":: Wallet"
         
         yield NetworkEnvironmentWidget(id="network", classes="hatch cross_theme")
-        
         with Container(id="wallet-container"):
             yield WalletList(self.client, id="wallet-list")
-        
-        switches = Horizontal(id="switches")
-        switches.border_subtitle = " :: Functions"
-        with switches:
-            with Vertical(classes="switch_container"):
-                yield Label("REFETCH", id="center")
-                #yield Switch(id="refetch", animate=False)
-                yield Button("F5",id="refetch")
-            with Vertical(classes="switch_container"):
-                yield Label("LOCK", id="center")
-                yield Switch(id="safe-lock")
+        yield FunctionSwitches()
 
         task_sheets = VerticalScroll(id="wallet-content")
         task_sheets.border_subtitle = ":: Submissions"
