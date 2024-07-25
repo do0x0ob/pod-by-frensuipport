@@ -104,11 +104,19 @@
 #wallet-content {
     padding: 1 0 0 0;
     text-align: center;
-    border: round #cc6666;
     scrollbar-color: #cc6666;
     scrollbar-color-hover: #0099cc;
     scrollbar-color-active: #cc6666;
     scrollbar-size-vertical: 1;
+}
+
+/*TODO: submissions style*/
+#submissions {
+    height: 100%;
+    scrollbar-color-hover: #0099cc;
+    scrollbar-color-active: #cc6666;
+    scrollbar-size-vertical: 1;
+    border: round #cc6666;
 }
 
 #wallet-list > Contents {

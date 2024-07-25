@@ -1,6 +1,7 @@
 from textual.app import ComposeResult
-from textual.widgets import ListView, ListItem, Label, Static, Button, Switch
-from textual.containers import Vertical, Horizontal
+from textual.widgets import ListView, ListItem, Label, Static, Button, Switch, ContentSwitcher, LoadingIndicator, Collapsible, RadioButton
+from textual.containers import Vertical, Horizontal, Container, VerticalScroll
+from textual.reactive import reactive
 from pysui import SuiConfig, AsyncClient
 from pysui.sui.sui_constants import (
     DEVNET_SUI_URL,
@@ -66,3 +67,48 @@ class FunctionSwitches(Horizontal):
         with Vertical(classes="switch_container"):
             yield Label("LOCK", id="center")
             yield Switch(id="safe-lock")
+
+class WalletContent(Container):
+    is_loading = reactive(True)
+
+    def compose(self) -> ComposeResult:
+        #yield Button("Refresh Wallet", id="refresh-button", variant="primary")
+        submissions = ContentSwitcher(initial="loading", id="submissions")
+        submissions.border_subtitle = ":: Submissions"
+        with submissions:
+            yield Label("Loading wallet content...", id="loading")
+            yield VerticalScroll(id="wallet-content")
+
+    def on_mount(self) -> None:
+        #self.query_one("#wallet-content").border_subtitle = ":: Submissions"
+        self.load_wallet_content()
+
+    """ TODO: move to panel layer to function
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id == "refetch":
+            self.load_wallet_content()
+    """
+
+    def load_wallet_content(self) -> None:
+        self.is_loading = True
+        self.query_one(ContentSwitcher).current = "loading"
+        
+        # 使用 set_timer 来模拟异步加载
+        self.set_timer(2, self._finish_loading)
+
+    def _finish_loading(self) -> None:
+        wallet_content = self.query_one("#wallet-content")
+        wallet_content.remove_children()
+        
+        wallet_content.mount(Collapsible(RadioButton("0x...5412542154125421", id="m1"), title="Greatest Coffee Maker Ever"))
+        wallet_content.mount(Collapsible(RadioButton("0x...5412542154125421", id="m2"), title="Learn Sui Move"))
+        wallet_content.mount(Collapsible(RadioButton("0x...5412542154125421", id="m3"), title="Home Brew Beer"))
+        
+        self.is_loading = False
+        self.query_one(ContentSwitcher).current = "wallet-content"
+
+    """ TODO: move to panel layer to function
+    def watch_is_loading(self, is_loading: bool) -> None:
+        refetch_button = self.query_one("#refetch", Button)
+        refetch_button.disabled = is_loading
+    """
