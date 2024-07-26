@@ -113,7 +113,7 @@ async def main():
     mod_cap_type = "0xc8e76738b2a255fe5a093a39f1eaa3b3ab869efcd62e4705c8790ceb7a532f02::public_task::ModCap"
     specific_type = "0xc8e76738b2a255fe5a093a39f1eaa3b3ab869efcd62e4705c8790ceb7a532f02::public_task::TaskSheet"
     await get_objects(client, object_type=specific_type)
-    await get_taskname_by_tasksheet(client, object_id="0xb770f9962ece25b4800ecdb0683d3d3713ad9ff33f6a8dec370dc6ee57078e18")
+    #await get_taskname_by_tasksheet(client, object_id="0xb770f9962ece25b4800ecdb0683d3d3713ad9ff33f6a8dec370dc6ee57078e18")
     #await get_objects(client, object_type=mod_cap_type)
     #await get_objects(client, specific_address)
 

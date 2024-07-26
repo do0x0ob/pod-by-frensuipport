@@ -7,23 +7,7 @@ from textual.reactive import reactive
 from textual.message import Message
 from render import TanhLoader
 from pysui import SuiConfig, AsyncClient
-from pysui.sui.sui_constants import (
-    DEVNET_SUI_URL,
-    LOCALNET_SUI_URL,
-    TESTNET_SUI_URL,
-    MAINNET_SUI_URL,
-    DEVNET_ENVIRONMENT_KEY,
-    LOCALNET_ENVIRONMENT_KEY,
-    TESTNET_ENVIRONMENT_KEY
-)
-
-NETWORK_ENV_MAP = {
-    DEVNET_SUI_URL: DEVNET_ENVIRONMENT_KEY,
-    LOCALNET_SUI_URL: LOCALNET_ENVIRONMENT_KEY,
-    TESTNET_SUI_URL: TESTNET_ENVIRONMENT_KEY,
-    MAINNET_SUI_URL: "mainnet"
-}
-
+from constants import NETWORK_ENV_MAP
 
 class NetworkEnvironmentWidget(Static):
     def on_mount(self) -> None:
@@ -85,13 +69,6 @@ class WalletContent(Container):
         submissions = ContentSwitcher(initial="loading", id="submissions")
         submissions.border_subtitle = ":: Submissions"
         with submissions:
-            """
-            yield Vertical(
-                TanhLoader(id="loading-animation"),
-                #Label("Loading wallet content...", id="loading-label"),
-                id="loading"
-            )
-            """
             yield Container(TanhLoader(id="loading-animation"), id="loading")
             yield VerticalScroll(id="wallet-content")
 
