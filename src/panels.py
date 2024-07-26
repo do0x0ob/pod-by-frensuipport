@@ -4,10 +4,11 @@ from textual.app import ComposeResult
 from custom_widgets import WalletList, NetworkEnvironmentWidget, FunctionSwitches, WalletContent, PanelController
 
 class LeftPanel(VerticalScroll):
-    def __init__(self, client, **kwargs):
+    def __init__(self, client, tasksheet_address, **kwargs):
         super().__init__(**kwargs)
         self.client = client
         self.controller = PanelController(self)
+        self.tasksheet_address = tasksheet_address
 
     def compose(self) -> ComposeResult:
         self.border_title = ":: Wallet"
@@ -16,7 +17,7 @@ class LeftPanel(VerticalScroll):
         with Container(id="wallet-container"):
             yield WalletList(self.client, id="wallet-list")
         yield FunctionSwitches()
-        yield WalletContent()
+        yield WalletContent(self.client, self.tasksheet_address)
     
     def on_button_pressed(self, event: Button.Pressed) -> None:
         self.controller.on_button_pressed(event)

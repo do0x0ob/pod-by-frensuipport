@@ -7,7 +7,10 @@ from textual.reactive import reactive
 from textual.message import Message
 from render import TanhLoader
 from pysui import SuiConfig, AsyncClient
+from pysui.sui.sui_types.address import SuiAddress
 from constants import NETWORK_ENV_MAP
+from api import get_submissions
+import logging
 
 class NetworkEnvironmentWidget(Static):
     def on_mount(self) -> None:
@@ -60,6 +63,12 @@ class FunctionSwitches(Horizontal):
 class WalletContent(Container):
     is_loading = reactive(True)
 
+    def __init__(self, client: AsyncClient, tasksheet_address: SuiAddress):
+        super().__init__()
+        self.client = client
+        self.tasksheet_address = tasksheet_address
+        self.logger = logging.getLogger(self.__class__.__name__)
+
     class OptionSelected(Message):
         def __init__(self, option_id: str):
             self.option_id = option_id
@@ -81,32 +90,27 @@ class WalletContent(Container):
         self.query_one(TanhLoader).is_animating = True
         self.set_timer(2, self._finish_loading)
 
-    def _finish_loading(self) -> None:
+    async def _finish_loading(self) -> None:
         wallet_content = self.query_one("#wallet-content")
         wallet_content.remove_children()
-
-        wallet_content.mount(
-            Vertical(
-                Container(
-                    Static("Python Alien Language Translator", classes="taskname"),
-                    classes="task_container"
-                ),
-                OptionList(
-                    Option("0x...5412542154125421", id="m1"),
-                    Option("0x...5412542154125422", id="m3"),
-                ),
-                classes="main_task_group"
-            )
-        )
-        wallet_content.mount(
-            Vertical(
-                Static("Good Task", classes="taskname"),
-                OptionList(
-                    Option("0x...5412542154125423", id="m2"),
-                ),
-                classes="main_task_group"
-            )
-        )
+        try:
+            submissions = await get_submissions()
+            for task_name, task_data in submissions.items():
+                task_container = Vertical(
+                    Container(
+                        Static(task_name, classes="taskname"),
+                        classes="task_container"
+                    ),
+                    OptionList(
+                        *[Option(f"{address[:8]}...{address[-24:]}", id=address)
+                        for address in task_data.keys()],
+                    ),
+                    classes="main_task_group"
+                )
+                wallet_content.mount(task_container)
+        
+        except Exception as e:
+            logging.debug(f"Error in _finish_loading: {str(e)}")
 
         self.is_loading = False
         self.query_one(TanhLoader).is_animating = False

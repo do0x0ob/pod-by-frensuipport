@@ -23,40 +23,61 @@ def save_tasks(tasks):
 TASKS = load_tasks()
 
 async def get_tasksheets(client: AsyncClient, address: SuiAddress = None, object_type: str = None):
-    """Get tasksheet objects from active address with status == 1"""
+    """Get all tasksheet objects from active address with status == 1"""
     address = address or client.config.active_address
     
-    builder = GetObjectsOwnedByAddress(address)
-    result = await client.execute(builder)
-    
     tasksheets = {}
+    status_1_count = 0
+    total_objects = 0
+    cursor = None
     
-    if result.is_ok():
-        objects = result.result_data.data
-        if object_type:
-            objects = [obj for obj in objects if obj.object_type == object_type]
+    while True:
+        builder = GetObjectsOwnedByAddress(address, cursor=cursor, limit=50)
+        result = await client.execute(builder)
         
-        for obj in objects:
-            object_read = await client.get_object(obj.object_id)
+        if result.is_ok():
+            page_data = result.result_data
+            objects = page_data.data
+            total_objects += len(objects)
             
-            if object_read.is_ok():
-                content = object_read.result_data.content
-                if content and hasattr(content, 'fields'):
-                    status = content.fields.get('status')
-                    if status == 1:
-                        tasksheet_id = obj.object_id
-                        main_task_id = content.fields.get('main_task_id', '')
-                        content_text = content.fields.get('content', '')
+            if object_type:
+                objects = [obj for obj in objects if obj.object_type == object_type]
+            
+            for obj in objects:
+                object_read = await client.get_object(obj.object_id)
+                
+                if object_read.is_ok():
+                    content = object_read.result_data.content
+                    if content and hasattr(content, 'fields'):
+                        status = content.fields.get('status')
+                        if status == 1:
+                            status_1_count += 1
                         
-                        tasksheets[tasksheet_id] = {
-                            "maintask_id": main_task_id,
-                            "content": content_text,
-                        }
+                        if status == 1 and (not object_type or obj.object_type == object_type):
+                            tasksheet_id = obj.object_id
+                            main_task_id = content.fields.get('main_task_id', '')
+                            content_text = content.fields.get('content', '')
+                            
+                            tasksheets[tasksheet_id] = {
+                                "maintask_id": main_task_id,
+                                "content": content_text,
+                            }
+                else:
+                    print(f"Error fetching object details: {object_read.result_string}")
+            
+            # Check if there are more objects
+            if page_data.has_next_page:
+                cursor = page_data.next_cursor
             else:
-                print(f"Error fetching object details: {object_read.result_string}")
-    else:
-        print(f"Error: {result.result_string}")
+                break  # No more objects, exit the loop
+        else:
+            print(f"Error: {result.result_string}")
+            break
     
+    print(f"Total objects: {total_objects}")
+    print(f"Objects with status 1: {status_1_count}")
+    print(f"Tasksheets added: {len(tasksheets)}")
+    print(f"debug:: {tasksheets}")
     return tasksheets
 
 
@@ -109,7 +130,8 @@ async def assemble_submissions_list(client: AsyncClient, tasksheets: dict) -> di
 
     return SUBMISSIONS
 
-async def main():
+
+async def get_submissions():
     cfg = SuiConfig.default_config()
     print(f"Using configuration from {os.environ.get(PYSUI_CLIENT_CONFIG_ENV, 'default location')}")
 
@@ -120,14 +142,11 @@ async def main():
     if tasksheet_address:
         tasksheets = await get_tasksheets(client, object_type=tasksheet_address)
         submissions = await assemble_submissions_list(client, tasksheets)
-        print("Submissions:")
-        print(json.dumps(submissions, indent=2))
-        
-        print("\nUpdated TASKS:")
-        print(json.dumps(TASKS, indent=2))
+        print(submissions)
+        return submissions
     else:
         print(f"No TASKSHEET address found for environment: {current_env}")
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(get_submissions())

@@ -59,6 +59,7 @@ async def get_objects(client: AsyncClient, address: SuiAddress = None, object_ty
         print(f"Objects owned by {address} with status == 1:")
         for obj in objects:
             # 获取对象的详细信息
+            print("all:",objects)
             object_read = await client.get_object(obj.object_id)
             
             if object_read.is_ok():
@@ -116,6 +117,6 @@ async def main():
     #await get_taskname_by_tasksheet(client, object_id="0xb770f9962ece25b4800ecdb0683d3d3713ad9ff33f6a8dec370dc6ee57078e18")
     #await get_objects(client, object_type=mod_cap_type)
     #await get_objects(client, specific_address)
-
+    
 if __name__ == "__main__":
     asyncio.run(main())
