@@ -1,9 +1,11 @@
+
 from textual.app import ComposeResult
 from textual.widgets import ListView, ListItem, Label, Static, Button, Switch, ContentSwitcher, OptionList
 from textual.widgets.option_list import Option
-from textual.containers import Vertical, Horizontal, Container, VerticalScroll, Center
+from textual.containers import Vertical, Horizontal, Container, VerticalScroll
 from textual.reactive import reactive
 from textual.message import Message
+from render import TanhLoader
 from pysui import SuiConfig, AsyncClient
 from pysui.sui.sui_constants import (
     DEVNET_SUI_URL,
@@ -70,6 +72,7 @@ class FunctionSwitches(Horizontal):
             yield Label("LOCK", id="center")
             yield Switch(id="safe-lock")
 
+
 class WalletContent(Container):
     is_loading = reactive(True)
 
@@ -79,11 +82,17 @@ class WalletContent(Container):
             super().__init__()
     
     def compose(self) -> ComposeResult:
-        #yield Button("Refresh Wallet", id="refresh-button", variant="primary")
         submissions = ContentSwitcher(initial="loading", id="submissions")
         submissions.border_subtitle = ":: Submissions"
         with submissions:
-            yield Label("Loading wallet content...", id="loading")
+            """
+            yield Vertical(
+                TanhLoader(id="loading-animation"),
+                #Label("Loading wallet content...", id="loading-label"),
+                id="loading"
+            )
+            """
+            yield Container(TanhLoader(id="loading-animation"), id="loading")
             yield VerticalScroll(id="wallet-content")
 
     def on_mount(self) -> None:
@@ -92,6 +101,7 @@ class WalletContent(Container):
     def load_wallet_content(self) -> None:
         self.is_loading = True
         self.query_one(ContentSwitcher).current = "loading"
+        self.query_one(TanhLoader).is_animating = True
         self.set_timer(2, self._finish_loading)
 
     def _finish_loading(self) -> None:
@@ -122,10 +132,13 @@ class WalletContent(Container):
         )
 
         self.is_loading = False
+        self.query_one(TanhLoader).is_animating = False
         self.query_one(ContentSwitcher).current = "wallet-content"
     
     def on_option_list_option_selected(self, event: OptionList.OptionSelected) -> None:
         self.post_message(self.OptionSelected(event.option.id))
+
+
 
 class PanelController:
     def __init__(self, panel):
@@ -142,3 +155,4 @@ class PanelController:
     def watch_is_loading(self, is_loading: bool) -> None:
         refetch_button = self.panel.query_one("#refetch", Button)
         refetch_button.disabled = is_loading
+

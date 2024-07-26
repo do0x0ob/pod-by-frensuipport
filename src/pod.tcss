@@ -142,6 +142,12 @@
     border-title-color: #cc6666;
 }
 
+#loading {
+    align: center middle;
+    padding: 0 1;
+    width: auto;
+}
+
 LoadingScreen {
     align: center middle;
 }
@@ -160,7 +166,7 @@ Horizontal > Static {
 }
 
 ListView > ListItem.--highlight {
-    background: #cc6666 80%;
+    background: #0099cc 80%;
 }
 
 TextArea {
@@ -207,7 +213,12 @@ OptionList:focus {
 }
 
 OptionList:focus > .option-list--option-highlighted {
-        background: #cc6666 80%;
+        background: #0099cc 80%;
+}
+
+/*TODO: testing*/
+TanhLoader {
+    height: 1;
 }
 
 .switch_container {
@@ -218,8 +229,8 @@ OptionList:focus > .option-list--option-highlighted {
 
 .taskname {
     width: 100%;
-    padding: 0 1;
-    border: ascii #cc6666;
+    padding: 0 0;
+    border: blank;
     color: #cc6666;
     text-style: bold italic underline;
 }
