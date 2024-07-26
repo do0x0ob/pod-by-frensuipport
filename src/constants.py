@@ -1,3 +1,4 @@
+import os
 from pysui.sui.sui_constants import (
     DEVNET_SUI_URL,
     LOCALNET_SUI_URL,
@@ -27,3 +28,5 @@ OBJECT_TYPE_ADDRESSES = {
         "mainnet": "0xYOUR_MAINNET_ADDRESS_HERE::public_task::TaskSheet"
     },
 }
+
+TASKS_FILE = os.path.join(os.path.dirname(__file__), 'tasks_cache.json')
