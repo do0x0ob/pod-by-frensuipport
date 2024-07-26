@@ -6,23 +6,24 @@ from pysui.sui.sui_constants import PYSUI_CLIENT_CONFIG_ENV
 import os
 import asyncio
 import warnings
-#import json
+import json
 from constants import NETWORK_ENV_MAP, OBJECT_TYPE_ADDRESSES
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 async def get_objects(client: AsyncClient, address: SuiAddress = None, object_type: str = None):
-    """get tasksheet objects from active address with status == 1"""
+    """Get tasksheet objects from active address with status == 1"""
     address = address or client.config.active_address
     
     builder = GetObjectsOwnedByAddress(address)
     result = await client.execute(builder)
+    
+    tasksheets = {}
     
     if result.is_ok():
         objects = result.result_data.data
         if object_type:
             objects = [obj for obj in objects if obj.object_type == object_type]
         
-        print(f"Objects owned by {address} with status == 1:")
         for obj in objects:
             object_read = await client.get_object(obj.object_id)
             
@@ -31,17 +32,20 @@ async def get_objects(client: AsyncClient, address: SuiAddress = None, object_ty
                 if content and hasattr(content, 'fields'):
                     status = content.fields.get('status')
                     if status == 1:
-                        print(f"  ID: {obj.object_id}")
-                        if 'content' in content.fields:
-                            print(f"  Content: {content.fields['content']}")
-                        if 'main_task_id' in content.fields:
-                            print(f"  Main Task ID: {content.fields['main_task_id']}")
-                        print()
+                        tasksheet_id = obj.object_id
+                        main_task_id = content.fields.get('main_task_id', '')
+                        content_text = content.fields.get('content', '')
+                        
+                        tasksheets[tasksheet_id] = {
+                            "maintask_id": main_task_id,
+                            "content": content_text,
+                        }
             else:
-                print(f"  Error fetching object details: {object_read.result_string}")
+                print(f"Error fetching object details: {object_read.result_string}")
     else:
         print(f"Error: {result.result_string}")
-
+    
+    return tasksheets
 
 async def main():
     cfg = SuiConfig.default_config()
@@ -50,7 +54,13 @@ async def main():
     client = AsyncClient(cfg)
     current_env = NETWORK_ENV_MAP.get(client.config.rpc_url, "unknown")
     tasksheet_address = OBJECT_TYPE_ADDRESSES["TASKSHEET"].get(current_env)
-    await get_objects(client, object_type=tasksheet_address)
+
+    if tasksheet_address:
+        tasksheets = await get_objects(client, object_type=tasksheet_address)
+        print("Tasksheets:")
+        print(json.dumps(tasksheets, indent=2))
+    else:
+        print(f"No TASKSHEET address found for environment: {current_env}")
 
 
 if __name__ == "__main__":
