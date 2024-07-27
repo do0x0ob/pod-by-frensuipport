@@ -259,3 +259,7 @@ TanhLoader {
     align: center middle;
     text-style: bold;
 }
+
+.options_container {
+    height: auto;
+}

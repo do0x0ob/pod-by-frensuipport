@@ -90,6 +90,7 @@ class WalletContent(Container):
         self.query_one(TanhLoader).is_animating = True
         self.set_timer(2, self._finish_loading)
 
+    """
     async def _finish_loading(self) -> None:
         wallet_content = self.query_one("#wallet-content")
         wallet_content.remove_children()
@@ -104,6 +105,36 @@ class WalletContent(Container):
                     OptionList(
                         *[Option(f"{address[:8]}...{address[-24:]}", id=address)
                         for address in task_data.keys()],
+                    ),
+                    classes="main_task_group"
+                )
+                wallet_content.mount(task_container)
+        
+        except Exception as e:
+            logging.debug(f"Error in _finish_loading: {str(e)}")
+
+        self.is_loading = False
+        self.query_one(TanhLoader).is_animating = False
+        self.query_one(ContentSwitcher).current = "wallet-content"
+    """
+
+    async def _finish_loading(self) -> None:
+        wallet_content = self.query_one("#wallet-content")
+        wallet_content.remove_children()
+        try:
+            submissions = await get_submissions()
+            for task_name, task_data in submissions.items():
+                task_container = Vertical(
+                    Container(
+                        Static(task_name, classes="taskname"),
+                        classes="task_container"
+                    ),
+                    Vertical(
+                        *[OptionList(
+                            Option(f"{address[:4]}...{address[-22:]}", id=address),
+                            classes="task_option"
+                        ) for address in task_data.keys()],
+                        classes="options_container"
                     ),
                     classes="main_task_group"
                 )
