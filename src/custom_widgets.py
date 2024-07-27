@@ -1,4 +1,4 @@
-
+import asyncio
 from textual.app import ComposeResult
 from textual.widgets import ListView, ListItem, Label, Static, Button, Switch, ContentSwitcher, OptionList
 from textual.widgets.option_list import Option
@@ -10,7 +10,6 @@ from pysui import SuiConfig, AsyncClient
 from pysui.sui.sui_types.address import SuiAddress
 from constants import NETWORK_ENV_MAP
 from api import get_submissions
-import logging
 
 class NetworkEnvironmentWidget(Static):
     def on_mount(self) -> None:
@@ -67,7 +66,6 @@ class WalletContent(Container):
         super().__init__()
         self.client = client
         self.tasksheet_address = tasksheet_address
-        self.logger = logging.getLogger(self.__class__.__name__)
 
     class OptionSelected(Message):
         def __init__(self, option_id: str):
@@ -88,35 +86,8 @@ class WalletContent(Container):
         self.is_loading = True
         self.query_one(ContentSwitcher).current = "loading"
         self.query_one(TanhLoader).is_animating = True
-        self.set_timer(2, self._finish_loading)
-
-    """
-    async def _finish_loading(self) -> None:
-        wallet_content = self.query_one("#wallet-content")
-        wallet_content.remove_children()
-        try:
-            submissions = await get_submissions()
-            for task_name, task_data in submissions.items():
-                task_container = Vertical(
-                    Container(
-                        Static(task_name, classes="taskname"),
-                        classes="task_container"
-                    ),
-                    OptionList(
-                        *[Option(f"{address[:8]}...{address[-24:]}", id=address)
-                        for address in task_data.keys()],
-                    ),
-                    classes="main_task_group"
-                )
-                wallet_content.mount(task_container)
-        
-        except Exception as e:
-            logging.debug(f"Error in _finish_loading: {str(e)}")
-
-        self.is_loading = False
-        self.query_one(TanhLoader).is_animating = False
-        self.query_one(ContentSwitcher).current = "wallet-content"
-    """
+        #self.set_timer(0.5, self._finish_loading)
+        asyncio.create_task(self._finish_loading())
 
     async def _finish_loading(self) -> None:
         wallet_content = self.query_one("#wallet-content")
@@ -141,7 +112,7 @@ class WalletContent(Container):
                 wallet_content.mount(task_container)
         
         except Exception as e:
-            logging.debug(f"Error in _finish_loading: {str(e)}")
+            print(f"Error in _finish_loading: {str(e)}")
 
         self.is_loading = False
         self.query_one(TanhLoader).is_animating = False
