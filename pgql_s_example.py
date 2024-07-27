@@ -654,17 +654,15 @@ def do_unstake(client: SyncGqlClient):
 if __name__ == "__main__":
 
     #
-    cfg = PysuiConfiguration(
-        group_name=PysuiConfiguration.SUI_GQL_RPC_GROUP  # , profile_name="testnet"
-    )
-    client_init = SyncGqlClient(
-        write_schema=False,
-        pysui_config=cfg,
-    )
-    print(f"Chain environment   '{client_init.chain_environment}'")
-    print(f"Default schema base version '{client_init.base_schema_version}'")
-    print(f"Default schema build version '{client_init.schema_version()}'")
+    client_init: SyncGqlClient = None
     try:
+        cfg = PysuiConfiguration(
+            group_name=PysuiConfiguration.SUI_GQL_RPC_GROUP  # , profile_name="testnet"
+        )
+        client_init = SyncGqlClient(write_schema=False, pysui_config=cfg)
+        print(f"Chain environment   '{client_init.chain_environment}'")
+        print(f"Default schema base version '{client_init.base_schema_version}'")
+        print(f"Default schema build version '{client_init.schema_version()}'")
         print()
         ## QueryNodes (fetch)
         # do_coin_meta(client_init)
@@ -715,4 +713,5 @@ if __name__ == "__main__":
         # do_protcfg(client_init)
     except Exception as ex:
         print(ex.args)
-    client_init.client().close_sync()
+    if client_init:
+        client_init.client().close_sync()
