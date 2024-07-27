@@ -8,6 +8,7 @@ import asyncio
 import warnings
 import json
 from constants import NETWORK_ENV_MAP, OBJECT_TYPE_ADDRESSES, TASKS_FILE
+#from files import MARKDOWN_CONTENT
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 def load_tasks():
@@ -142,11 +143,25 @@ async def get_submissions():
     if tasksheet_address:
         tasksheets = await get_tasksheets(client, object_type=tasksheet_address)
         submissions = await assemble_submissions_list(client, tasksheets)
-        print(submissions)
+        
+        markdown_contents = {}
+        
+        for _, task_submissions in submissions.items():
+            for tasksheet_id, submission_data in task_submissions.items():
+                markdown_content = submission_data['content'] + "\n\n"
+                markdown_contents[tasksheet_id] = markdown_content
+        
+        json_file_path = os.path.join('markdown_contents.json')
+        
+        with open(json_file_path, 'w', encoding='utf-8') as f:
+            json.dump(markdown_contents, f, ensure_ascii=False, indent=2)
+        
+        print(f"Markdown contents have been written to {json_file_path}")
         return submissions
     else:
         print(f"No TASKSHEET address found for environment: {current_env}")
-
+        return {}
+    
 
 if __name__ == "__main__":
     asyncio.run(get_submissions())

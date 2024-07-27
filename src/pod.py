@@ -5,6 +5,7 @@ from textual.reactive import reactive
 from textual import events
 from pysui import SuiConfig, AsyncClient
 from screens import LoadingScreen, Mod_Screen
+from api import get_submissions
 
 class Pod_By_FrenSuipport(App):
     CSS_PATH = "pod.tcss"
@@ -38,6 +39,7 @@ class Pod_By_FrenSuipport(App):
 
     async def on_load(self) -> None:
         await self.init_client()
+        await get_submissions() #TODO: 應該在 api.py 中另開一個類似方法來修改，返回值跟寫入 file 要分離，寫入 file 的 fuction 取代現在這個
 
     async def init_client(self) -> None:
         cfg = SuiConfig.default_config()

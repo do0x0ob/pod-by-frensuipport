@@ -86,15 +86,14 @@ class WalletContent(Container):
         self.is_loading = True
         self.query_one(ContentSwitcher).current = "loading"
         self.query_one(TanhLoader).is_animating = True
-        #self.set_timer(0.5, self._finish_loading)
         asyncio.create_task(self._finish_loading())
 
     async def _finish_loading(self) -> None:
         wallet_content = self.query_one("#wallet-content")
         wallet_content.remove_children()
         try:
-            submissions = await get_submissions()
-            for task_name, task_data in submissions.items():
+            submissions = await get_submissions() #TODO: 將這裡的數據獲取來源改成從文件獲取
+            for task_name, task_data in submissions.items(): #TODO: 將這裡的數據獲取來源改成從文件獲取
                 task_container = Vertical(
                     Container(
                         Static(task_name, classes="taskname"),
@@ -102,7 +101,7 @@ class WalletContent(Container):
                     ),
                     Vertical(
                         *[OptionList(
-                            Option(f"{address[:4]}...{address[-22:]}", id=address),
+                            Option(f"{address[:4]}...{address[-22:]}", id=f"id_{address}"),
                             classes="task_option"
                         ) for address in task_data.keys()],
                         classes="options_container"
