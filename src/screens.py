@@ -12,36 +12,15 @@ import json
 
 
 class LoadingScreen(Screen):
+    """ Main Screen for MOD"""
     def compose(self) -> ComposeResult:
         yield Static(welcome, classes="ascii_text")
 
 class Mod_Screen(Screen):
-    
-    
     def __init__(self):
         super().__init__()
         self.client = AsyncClient(SuiConfig.default_config())
         self.tasksheet_address = "0xc8e76738b2a255fe5d093a39f1eaa3b3ab869efcd62e4705c8790ceb7a532f02::public_task::Task"
-
-    """
-    def compose(self) -> ComposeResult:
-        yield Header(show_clock=True)
-        with Container(id="app-grid"):
-            yield LeftPanel(self.app.client, self.tasksheet_address, id="left-pane")
-            top_right = ContentSwitcher(initial="splash", id="top-right")
-            top_right.border_title = ":: Content"
-            with top_right:
-                yield Splash(id="splash")
-                markdown_contents = self.load_markdown_content() #TODO: 優化為獨立函數，點擊刷新之後可以重複使用，生成最新 markdown view
-                for submission_id, content in markdown_contents.items():
-                    yield MarkdownViewer(
-                        content,
-                        id=f"id_{submission_id}",
-                        show_table_of_contents=False
-                    )
-            yield BottomRight(id="bottom-right")
-        yield Footer()
-    """
 
     def compose(self) -> ComposeResult:
         yield Header(show_clock=True)
@@ -66,7 +45,7 @@ class Mod_Screen(Screen):
             print("Error decoding JSON from markdown_contents.json.")
             return {}
         
-    #TODO: test
+
     async def load_and_switch_content(self, option_id: str) -> None:
         content_switcher = self.query_one("#top-right", ContentSwitcher)
         viewer_id = f"id_{option_id}"
@@ -102,36 +81,25 @@ class Mod_Screen(Screen):
         bottom_right = self.query_one("#bottom-right", BottomRight)
         bottom_right.update_buttons_state(is_locked)
     
-    """
-    def switch_content(self, content_id: str) -> None:
-        content_switcher = self.query_one("#top-right", ContentSwitcher)
-        content_switcher.current = content_id
-        if content_id == "splash":
-            content_switcher.remove_class("markdown-view")
-        else:
-            content_switcher.add_class("markdown-view")
-    """
 
     def switch_content(self, content_id: str) -> None:
         content_switcher = self.query_one("#top-right", ContentSwitcher)
         content_switcher.current = content_id
         self.update_top_right_style(content_id)
 
-    #TODO: test
+
     def on_wallet_content_option_selected(self, event: WalletContent.OptionSelected) -> None:
         option_id = event.option_id.replace("id_", "")
         self.run_worker(self.load_and_switch_content(option_id))
+        self.update_top_right_style(event.option_id)
 
-    
-    #TODO: test
+
     def update_top_right_style(self, content_id: str) -> None:
         content_switcher = self.query_one("#top-right", ContentSwitcher)
-        if content_id == "splash":
-            content_switcher.remove_class("markdown-view")
-            content_switcher.add_class("splash-view")
-        else:
-            content_switcher.remove_class("splash-view")
-            content_switcher.add_class("markdown-view")
+        visible_class = "visible_border" if content_id != "splash" else "invisible_border"
+        invisible_class = "invisible_border" if content_id != "splash" else "visible_border"
+        content_switcher.remove_class(invisible_class)
+        content_switcher.add_class(visible_class)
 
 
     def on_button_pressed(self, event: Button.Pressed) -> None:

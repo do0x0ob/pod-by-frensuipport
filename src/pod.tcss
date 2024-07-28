@@ -228,13 +228,16 @@ OptionList:focus > .option-list--option-highlighted {
         background: #0099cc 80%;
 }
 
-/*TODO: testing*/
 TanhLoader {
     height: 1;
 }
 
 .invisible_border {
     border: inner $panel;
+}
+
+.visible_border {
+    border: double #cc6666;
 }
 
 
