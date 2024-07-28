@@ -8,7 +8,6 @@ import asyncio
 import warnings
 import json
 from constants import NETWORK_ENV_MAP, OBJECT_TYPE_ADDRESSES, TASKS_FILE
-#from files import MARKDOWN_CONTENT
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 def load_tasks():
@@ -26,60 +25,48 @@ TASKS = load_tasks()
 async def get_tasksheets(client: AsyncClient, address: SuiAddress = None, object_type: str = None):
     """Get all tasksheet objects from active address with status == 1"""
     address = address or client.config.active_address
-    
+
     tasksheets = {}
     status_1_count = 0
     total_objects = 0
     cursor = None
-    
+
     while True:
         builder = GetObjectsOwnedByAddress(address, cursor=cursor, limit=50)
         result = await client.execute(builder)
-        
-        if result.is_ok():
-            page_data = result.result_data
-            objects = page_data.data
-            total_objects += len(objects)
-            
-            if object_type:
-                objects = [obj for obj in objects if obj.object_type == object_type]
-            
-            for obj in objects:
-                object_read = await client.get_object(obj.object_id)
-                
-                if object_read.is_ok():
-                    content = object_read.result_data.content
-                    if content and hasattr(content, 'fields'):
-                        status = content.fields.get('status')
-                        if status == 1:
-                            status_1_count += 1
-                        
-                        if status == 1 and (not object_type or obj.object_type == object_type):
-                            tasksheet_id = obj.object_id
-                            main_task_id = content.fields.get('main_task_id', '')
-                            content_text = content.fields.get('content', '')
-                            
-                            tasksheets[tasksheet_id] = {
-                                "maintask_id": main_task_id,
-                                "content": content_text,
-                            }
-                else:
-                    print(f"Error fetching object details: {object_read.result_string}")
-            
-            # Check if there are more objects
-            if page_data.has_next_page:
-                cursor = page_data.next_cursor
-            else:
-                break  # No more objects, exit the loop
-        else:
+
+        if not result.is_ok():
             print(f"Error: {result.result_string}")
             break
-    """
-    print(f"Total objects: {total_objects}")
-    print(f"Objects with status 1: {status_1_count}")
-    print(f"Tasksheets added: {len(tasksheets)}")
-    print(f"debug:: {tasksheets}")
-    """
+
+        page_data = result.result_data
+        objects = page_data.data
+        total_objects += len(objects)
+
+        if object_type:
+            objects = [obj for obj in objects if obj.object_type == object_type]
+
+        for obj in objects:
+            object_read = await client.get_object(obj.object_id)
+
+            if object_read.is_ok():
+                content = object_read.result_data.content
+                if hasattr(content, 'fields'):
+                    status = content.fields.get('status')
+                    if status == 1:
+                        status_1_count += 1
+                        if not object_type or obj.object_type == object_type:
+                            tasksheets[obj.object_id] = {
+                                "maintask_id": content.fields.get('main_task_id', ''),
+                                "content": content.fields.get('content', ''),
+                            }
+            else:
+                print(f"Error fetching object details: {object_read.result_string}")
+
+        cursor = page_data.next_cursor if page_data.has_next_page else None
+        if cursor is None:
+            break  # No more objects, exit the loop
+
     return tasksheets
 
 
@@ -111,22 +98,15 @@ async def assemble_submissions_list(client: AsyncClient, tasksheets: dict) -> di
         maintask_id = tasksheet_data['maintask_id']
         content = tasksheet_data['content']
 
-        # Check if maintask_id is in TASKS
-        if maintask_id not in TASKS:
-            # If not, fetch the maintask name from the network
-            task_name = await get_taskname_by_tasksheet(client, maintask_id)
-            TASKS[maintask_id] = task_name
-            tasks_updated = True
-        else:
-            task_name = TASKS[maintask_id]
+        task_name = TASKS.get(maintask_id) or await get_taskname_by_tasksheet(client, maintask_id)
+        TASKS[maintask_id] = task_name
+        tasks_updated = maintask_id not in TASKS
 
-        # Add data to the SUBMISSIONS dictionary
         if task_name not in SUBMISSIONS:
             SUBMISSIONS[task_name] = {}
-        
+
         SUBMISSIONS[task_name][tasksheet_id] = {"content": content}
 
-    # If TASKS has been updated, save to file
     if tasks_updated:
         save_tasks(TASKS)
 
@@ -140,29 +120,28 @@ async def get_submissions():
     client = AsyncClient(cfg)
     current_env = NETWORK_ENV_MAP.get(client.config.rpc_url, "unknown")
     tasksheet_address = OBJECT_TYPE_ADDRESSES["TASKSHEET"].get(current_env)
-    
-    if tasksheet_address:
-        tasksheets = await get_tasksheets(client, object_type=tasksheet_address)
-        submissions = await assemble_submissions_list(client, tasksheets)
-        
-        markdown_contents = {}
-        
-        for _, task_submissions in submissions.items():
-            for tasksheet_id, submission_data in task_submissions.items():
-                markdown_content = submission_data['content'] + "\n\n"
-                markdown_contents[tasksheet_id] = markdown_content
-        
-        json_file_path = os.path.join('markdown_contents.json')
-        
-        with open(json_file_path, 'w', encoding='utf-8') as f:
-            json.dump(markdown_contents, f, ensure_ascii=False, indent=2)
-        
-        print(f"Markdown contents have been written to {json_file_path}")
-        return submissions
-    else:
+
+    if not tasksheet_address:
         print(f"No TASKSHEET address found for environment: {current_env}")
         return {}
+
+    tasksheets = await get_tasksheets(client, object_type=tasksheet_address)
+    submissions = await assemble_submissions_list(client, tasksheets)
+
+    markdown_contents = {
+        tasksheet_id: submission_data['content'] + "\n\n"
+        for task_submissions in submissions.values()
+        for tasksheet_id, submission_data in task_submissions.items()
+    }
+
+    json_file_path = 'markdown_contents.json'
     
+    with open(json_file_path, 'w', encoding='utf-8') as f:
+        json.dump(markdown_contents, f, ensure_ascii=False, indent=2)
+    
+    print(f"Markdown contents have been written to {json_file_path}")
+    return submissions
+
 
 if __name__ == "__main__":
     asyncio.run(get_submissions())

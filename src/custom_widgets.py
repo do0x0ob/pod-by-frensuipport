@@ -92,8 +92,8 @@ class WalletContent(Container):
         wallet_content = self.query_one("#wallet-content")
         wallet_content.remove_children()
         try:
-            submissions = await get_submissions() #TODO: 將這裡的數據獲取來源改成從文件獲取
-            for task_name, task_data in submissions.items(): #TODO: 將這裡的數據獲取來源改成從文件獲取
+            submissions = await get_submissions()
+            for task_name, task_data in submissions.items():
                 task_container = Vertical(
                     Container(
                         Static(task_name, classes="taskname"),
