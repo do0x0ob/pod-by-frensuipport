@@ -74,11 +74,12 @@ async def get_tasksheets(client: AsyncClient, address: SuiAddress = None, object
         else:
             print(f"Error: {result.result_string}")
             break
-    
+    """
     print(f"Total objects: {total_objects}")
     print(f"Objects with status 1: {status_1_count}")
     print(f"Tasksheets added: {len(tasksheets)}")
     print(f"debug:: {tasksheets}")
+    """
     return tasksheets
 
 

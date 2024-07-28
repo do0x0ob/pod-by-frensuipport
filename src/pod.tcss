@@ -53,14 +53,10 @@
     height: 100%;
     column-span: 4;
     row-span: 4;
-    border: inner $panel;
     /*border: double #cc6666;*/
+    /*border: inner $panel;*/
     margin: 0;
     padding: 0;
-}
-
-#top-right.markdown-view {
-    border: double #cc6666;
 }
 
 #bottom-right {
@@ -148,6 +144,22 @@
     width: auto;
 }
 
+MarkdownViewer {
+    scrollbar-color: #cc6666;
+    scrollbar-color-hover: #0099cc;
+    scrollbar-color-active: #cc6666;
+    scrollbar-size-vertical: 1;
+}
+
+#top-right.splash-view {
+    border: inner $panel;
+}
+
+
+#top-right.markdown-view {
+    border: double #cc6666;
+}
+
 LoadingScreen {
     align: center middle;
 }
@@ -220,6 +232,11 @@ OptionList:focus > .option-list--option-highlighted {
 TanhLoader {
     height: 1;
 }
+
+.invisible_border {
+    border: inner $panel;
+}
+
 
 .switch_container {
     height: auto;
