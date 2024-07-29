@@ -70,18 +70,22 @@ async def get_tasksheets(client: AsyncClient, address: SuiAddress = None, object
 
     return tasksheets
 
-async def get_taskname_and_rewardtype_by_tasksheet(client: AsyncClient, object_id: str, version: Optional[int] = None) -> Tuple[str, str]:
-    """get task name and reward type by tasksheet"""
+
+async def get_taskname_and_rewardtype_by_tasksheet(client: AsyncClient, object_id: str, version: Optional[int] = None) -> Tuple[str, str, str]:
+    """get task name, reward type, and main task id by tasksheet"""
     sobject = await client.get_object(object_id, version)
 
     if sobject.is_ok():
         data = json.loads(sobject.result_data.to_json())
-        if 'content' in data and 'fields' in data['content'] and 'name' in data['content']['fields']:
-            task_name = data['content']['fields']['name']
+        if 'content' in data and 'fields' in data['content']:
+            task_name = data['content']['fields'].get('name', 'Unknown Task')
             object_type = data['content']['type']
             reward_type = object_type.split('<')[1].split('>')[0] if '<' in object_type and '>' in object_type else ''
-            return task_name, reward_type
-    return "Unknown Task", ""
+            main_task_id = data['content']['fields'].get('main_task_id', '')
+            print(task_name, reward_type, main_task_id)
+            return task_name, reward_type, main_task_id
+    return "Unknown Task", "", ""
+
 
 async def assemble_submissions_list(client: AsyncClient, tasksheets: dict) -> dict:
     global TASKS
@@ -101,15 +105,20 @@ async def assemble_submissions_list(client: AsyncClient, tasksheets: dict) -> di
         if task_name not in SUBMISSIONS:
             SUBMISSIONS[task_name] = {
                 "reward_type": reward_type,
+                "maintask_id": maintask_id,
                 "tasksheets": {}
             }
 
-        SUBMISSIONS[task_name]["tasksheets"][tasksheet_id] = {"content": content}
+        SUBMISSIONS[task_name]["tasksheets"][tasksheet_id] = {
+            "content": content,
+            "maintask_id": maintask_id
+        }
 
     if tasks_updated:
         save_tasks(TASKS)
 
     return SUBMISSIONS
+
 
 async def get_submissions():
     cfg = SuiConfig.default_config()
@@ -132,13 +141,35 @@ async def get_submissions():
         for tasksheet_id, submission_data in task_submissions["tasksheets"].items()
     }
 
-    json_file_path = 'markdown_contents.json'
-    
-    with open(json_file_path, 'w', encoding='utf-8') as f:
+
+    task_info = {}
+    for task_name, task_data in submissions.items():
+        task_info[task_name] = {
+            "reward_type": task_data["reward_type"],
+            "maintask_id": task_data["maintask_id"],
+            "tasksheets": {}
+        }
+        for tasksheet_id, submission_data in task_data["tasksheets"].items():
+            task_info[task_name]["tasksheets"][tasksheet_id] = {
+                "content": submission_data["content"],
+                "maintask_id": submission_data["maintask_id"]
+            }
+
+
+
+    markdown_file_path = 'markdown_contents.json'
+    with open(markdown_file_path, 'w', encoding='utf-8') as f:
         json.dump(markdown_contents, f, ensure_ascii=False, indent=2)
     
-    print(f"Markdown contents have been written to {json_file_path}")
-    #print(submissions)
+    print(f"Markdown contents have been written to {markdown_file_path}")
+
+
+    task_info_file_path = 'task_info.json'
+    with open(task_info_file_path, 'w', encoding='utf-8') as f:
+        json.dump(task_info, f, ensure_ascii=False, indent=2)
+    
+    print(f"Task info has been written to {task_info_file_path}")
+    print("debug", submissions)
     return submissions
 
 if __name__ == "__main__":
