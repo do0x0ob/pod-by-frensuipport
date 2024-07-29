@@ -103,7 +103,7 @@ class WalletContent(Container):
                         *[OptionList(
                             Option(f"{address[:4]}...{address[-22:]}", id=f"id_{address}"),
                             classes="task_option"
-                        ) for address in task_data.keys()],
+                        ) for address in task_data['tasksheets'].keys()],
                         classes="options_container"
                     ),
                     classes="main_task_group"
