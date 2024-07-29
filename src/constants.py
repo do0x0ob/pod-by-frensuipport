@@ -30,3 +30,7 @@ OBJECT_TYPE_ADDRESSES = {
 }
 
 TASKS_FILE = os.path.join(os.path.dirname(__file__), 'tasks_cache.json')
+
+SUI_CLOCK_ID = "0x6"
+
+TESTNET_PACKAGE_ID = "0xc8e76738b2a255fe5a093a39f1eaa3b3ab869efcd62e4705c8790ceb7a532f02"

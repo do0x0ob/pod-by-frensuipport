@@ -73,7 +73,7 @@
     border: double #cc6666;
 }
 
-#void {
+#annotation_input {
     column-span: 3;
     padding: 0 1;
 }

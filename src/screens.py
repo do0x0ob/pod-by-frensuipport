@@ -104,9 +104,10 @@ class Mod_Screen(Screen):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         if event.button.id == "approve":
-            self.notify("Submission approved!", title="Approval", severity="information")
+            self.notify("Sending approving...", title="Approval", severity="information")
         elif event.button.id == "decline":
-            self.notify("Submission declined!", title="Decline", severity="error")
-        
-        textarea = self.query_one("#void", TextArea)
+            self.notify("Sending declining...", title="Decline", severity="error")
+        """
+        textarea = self.query_one("#annotation_input", TextArea)
         textarea.clear()
+        """
