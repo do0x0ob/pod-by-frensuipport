@@ -35,7 +35,7 @@ class Pod_By_FrenSuipport(App):
 
     def on_mount(self) -> None:
         self.push_screen("loading")
-        self.set_timer(2.5, self.load_main_screen)
+        self.set_timer(1, self.load_main_screen)
 
     async def on_load(self) -> None:
         await self.init_client()
@@ -70,10 +70,12 @@ class Pod_By_FrenSuipport(App):
             self.screen.action_splash()
     
     def action_refresh(self) -> None:
+        print("Debug: action_refresh called")
         if isinstance(self.screen, Mod_Screen):
             wallet_content = self.screen.query_one("WalletContent")
             if wallet_content:
                 wallet_content.load_wallet_content()
+
 
 if __name__ == "__main__":
     app = Pod_By_FrenSuipport()

@@ -1,6 +1,6 @@
 from textual.screen import Screen
 from textual.containers import Container
-from textual.widgets import Header, ContentSwitcher, Footer, Button, MarkdownViewer, TextArea, Static
+from textual.widgets import Header, ContentSwitcher, Footer, Button, MarkdownViewer, Static
 from textual.app import ComposeResult
 from textual.css.query import NoMatches
 from ascii_art import welcome
@@ -107,7 +107,3 @@ class Mod_Screen(Screen):
             self.notify("Sending approving...", title="Approval", severity="information")
         elif event.button.id == "decline":
             self.notify("Sending declining...", title="Decline", severity="error")
-        """
-        textarea = self.query_one("#annotation_input", TextArea)
-        textarea.clear()
-        """

@@ -1,11 +1,14 @@
+import json
 from textual import on
 from textual.containers import Container, Horizontal, VerticalScroll
-from textual.widgets import Button, TextArea
+from textual.widgets import Button, TextArea, ContentSwitcher
 from textual.app import ComposeResult
 from custom_widgets import WalletList, NetworkEnvironmentWidget, FunctionSwitches, WalletContent, PanelController
 from movecall import approve_tasksheet
 
+
 class LeftPanel(VerticalScroll):
+
     def __init__(self, client, tasksheet_address, **kwargs):
         super().__init__(**kwargs)
         self.client = client
@@ -28,6 +31,11 @@ class LeftPanel(VerticalScroll):
         self.controller.watch_is_loading(is_loading)
         
 class BottomRight(Horizontal):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.task_info = self.load_task_info()
+
     def compose(self) -> ComposeResult:
         self.border_title = ":: Annotations"
         
@@ -45,13 +53,42 @@ class BottomRight(Horizontal):
         approve_button.disabled = is_locked
         decline_button.disabled = is_locked
     
+    def load_task_info(self):
+        with open('task_info.json', 'r') as f:
+            return json.load(f)
+        
+    def get_main_task_id(self, tasksheet_id):
+        for task_name, task_data in self.task_info.items():
+            if 'tasksheets' in task_data:
+                for sheet_id, sheet_data in task_data['tasksheets'].items():
+                    if sheet_id == tasksheet_id:
+                        maintask_id = task_data.get('maintask_id')
+                        return maintask_id
+        print("No matching tasksheet found")
+        return None
+    
+    def reload_task_info(self):
+        self.task_info = self.load_task_info()
+        self.notify(f"Debug: Reloaded task_info: {json.dumps(self.task_info, indent=2)}")
+    
+    
     @on(Button.Pressed, "#approve")
     def handle_approve(self, event: Button.Pressed) -> None:
+
         annotation = self.query_one("#annotation_input", TextArea)
+        task_sheet_id = self.screen.query_one("#top-right", ContentSwitcher).current.removeprefix("id_")
+        task_id = self.get_main_task_id(task_sheet_id)
+
+
+        if not task_sheet_id:
+            self.notify(f"No tasksheet selected! Debug: task_sheet_id = {task_sheet_id}, task_id = {task_id}")
+            return
+    
+        if not task_id:
+            self.notify(f"Main task ID not found! Debug: task_sheet_id = {task_sheet_id}, task_id = {task_id}")
+            return
         
-        # 這裡你需要獲取其他必要的參數
-        task_id = "0x690ecfcaca9af8c8708282e5242ce0ac1df3c4f13c2c3e95479adb6f28930e11"
-        task_sheet_id = "0x95485527d405e1e6158a325bff84da75ff270dbfbc197982471fb5656adffb5f"
+        # TODO: get from config.file
         mod_cap_id = "0x263c23fd72b08bda2adec5298c797f35e9f2e9d87043b6efeb773a5b202faa5c"
 
         res = approve_tasksheet(task_id, task_sheet_id, mod_cap_id, annotation.text)
@@ -59,3 +96,4 @@ class BottomRight(Horizontal):
             annotation.clear()
             self.app.action_refresh()
             self.screen.action_splash()
+            self.notify("Task Sheet Approved Successful", title="Approval", severity="information")
