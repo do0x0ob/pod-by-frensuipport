@@ -62,9 +62,9 @@ class BottomRight(Horizontal):
 
     def get_main_task_id(self, tasksheet_id):
         self.reload_task_info()
-        for task_name, task_data in self.task_info.items():
+        for _task_name, task_data in self.task_info.items():
             if 'tasksheets' in task_data:
-                for sheet_id, sheet_data in task_data['tasksheets'].items():
+                for sheet_id, _sheet_data in task_data['tasksheets'].items():
                     if sheet_id == tasksheet_id:
                         maintask_id = task_data.get('maintask_id')
                         return maintask_id
