@@ -70,7 +70,6 @@ class Pod_By_FrenSuipport(App):
             self.screen.action_splash()
     
     def action_refresh(self) -> None:
-        print("Debug: action_refresh called")
         if isinstance(self.screen, Mod_Screen):
             wallet_content = self.screen.query_one("WalletContent")
             if wallet_content:

@@ -57,7 +57,11 @@ class BottomRight(Horizontal):
         with open('task_info.json', 'r') as f:
             return json.load(f)
         
+    def reload_task_info(self):
+        self.task_info = self.load_task_info()
+
     def get_main_task_id(self, tasksheet_id):
+        self.reload_task_info()
         for task_name, task_data in self.task_info.items():
             if 'tasksheets' in task_data:
                 for sheet_id, sheet_data in task_data['tasksheets'].items():
@@ -66,11 +70,6 @@ class BottomRight(Horizontal):
                         return maintask_id
         print("No matching tasksheet found")
         return None
-    
-    def reload_task_info(self):
-        self.task_info = self.load_task_info()
-        self.notify(f"Debug: Reloaded task_info: {json.dumps(self.task_info, indent=2)}")
-    
     
     @on(Button.Pressed, "#approve")
     def handle_approve(self, event: Button.Pressed) -> None:
@@ -81,11 +80,11 @@ class BottomRight(Horizontal):
 
 
         if not task_sheet_id:
-            self.notify(f"No tasksheet selected! Debug: task_sheet_id = {task_sheet_id}, task_id = {task_id}")
+            self.notify("No tasksheet selected!")
             return
     
         if not task_id:
-            self.notify(f"Main task ID not found! Debug: task_sheet_id = {task_sheet_id}, task_id = {task_id}")
+            self.notify("Main task ID not found!")
             return
         
         # TODO: get from config.file
