@@ -106,4 +106,4 @@ class Mod_Screen(Screen):
         if event.button.id == "approve":
             self.notify("Sending approving...", title="Approval", severity="information")
         elif event.button.id == "decline":
-            self.notify("Sending declining...", title="Decline", severity="error")
+            self.notify("Declining task sheet...", title="Decline", severity="error")

@@ -40,7 +40,7 @@ def approve_tasksheet(reward_type: str, task_id: str, task_sheet_id: str, mod_ca
     )
 
     # execute transaction and return result
-    tx_result = handle_result(txn.execute())    
+    tx_result = handle_result(txn.execute())
     return True if tx_result.effects.status.status == "success"  else False
 
 
@@ -71,12 +71,3 @@ def reject_tasksheet(task_sheet_id: str, mod_cap_id: str, annotation: str):
 
     tx_result = handle_result(txn.execute())
     return True if tx_result.effects.status.status == "success" else False
-
-# for test only
-task_sheet_id = "0x77aafda59464930e32f3198fe42d710020ed96be1d016038ba5997c90910cc04"
-mod_cap_id = "0x263c23fd72b08bda2adec5298c797f35e9f2e9d87043b6efeb773a5b202faa5c"
-annotation = "test"
-
-if __name__ == "__main__":
-    reject_tasksheet(task_sheet_id, mod_cap_id, annotation)
-    
