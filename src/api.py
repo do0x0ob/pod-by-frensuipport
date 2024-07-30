@@ -97,7 +97,8 @@ async def assemble_submissions_list(client: AsyncClient, tasksheets: dict) -> di
 
         task_name, reward_type = TASKS.get(maintask_id, (None, None))
         if task_name is None:
-            task_name, reward_type = await get_taskname_and_rewardtype_by_tasksheet(client, maintask_id)
+            result = await get_taskname_and_rewardtype_by_tasksheet(client, maintask_id)
+            task_name, reward_type = result[:2]
             TASKS[maintask_id] = (task_name, reward_type)
             tasks_updated = True
 
