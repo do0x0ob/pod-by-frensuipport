@@ -1,4 +1,5 @@
 import json
+import configparser
 from textual import on
 from textual.containers import Container, Horizontal, VerticalScroll
 from textual.widgets import Button, TextArea, ContentSwitcher
@@ -68,16 +69,27 @@ class BottomRight(Horizontal):
                     if sheet_id == tasksheet_id:
                         maintask_id = task_data.get('maintask_id')
                         return maintask_id
-        print("No matching tasksheet found")
         return None
     
+    
+    def load_modcap_config(self):
+        config = configparser.ConfigParser()
+        config.read('modcap_config.ini')
+        if 'maintask_to_modcap' not in config:
+            return {}
+        return dict(config['maintask_to_modcap'])
+    
+    def get_modcap_id(self, maintask_id):
+        config = self.load_modcap_config()
+        return config.get(maintask_id)
+    
+    
     @on(Button.Pressed, "#approve")
-    def handle_approve(self, event: Button.Pressed) -> None:
+    def handle_approve(self) -> None:
 
         annotation = self.query_one("#annotation_input", TextArea)
         task_sheet_id = self.screen.query_one("#top-right", ContentSwitcher).current.removeprefix("id_")
         task_id = self.get_main_task_id(task_sheet_id)
-
 
         if not task_sheet_id:
             self.notify("No tasksheet selected!")
@@ -87,8 +99,11 @@ class BottomRight(Horizontal):
             self.notify("Main task ID not found!")
             return
         
-        # TODO: get from config.file
-        mod_cap_id = "0x263c23fd72b08bda2adec5298c797f35e9f2e9d87043b6efeb773a5b202faa5c"
+        # get from config.file TODO: turn to auto get on chain later
+        mod_cap_id = self.get_modcap_id(task_id)
+        if mod_cap_id is None:
+            self.notify(f"ModCap ID not found for task {task_id}!")
+            return
 
         res = approve_tasksheet(task_id, task_sheet_id, mod_cap_id, annotation.text)
         if res:
@@ -96,3 +111,5 @@ class BottomRight(Horizontal):
             self.app.action_refresh()
             self.screen.action_splash()
             self.notify("Task Sheet Approved Successful", title="Approval", severity="information")
+        else:
+            self.notify("Task Sheet Approved Failed", title="Failed", severity="Error")

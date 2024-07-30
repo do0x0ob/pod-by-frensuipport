@@ -30,7 +30,8 @@ def approve_tasksheet(task_id: str, task_sheet_id: str, mod_cap_id: str, annotat
         ObjectID(SUI_CLOCK_ID),
         ObjectID(mod_cap_id),
     ]
-    type_arguments = ["0xe08560c1186b5d6cee1623c1a251f0879e998ded8c27f64302632f18cadea5f2::faucet_eyes::FAUCET_EYES"]  # type<T> #TODO: dynamically
+    # type<T> #TODO: dynamically
+    type_arguments = ["0xe08560c1186b5d6cee1623c1a251f0879e998ded8c27f64302632f18cadea5f2::faucet_eyes::FAUCET_EYES"]
 
     # add move call order
     txn.move_call(
@@ -42,8 +43,3 @@ def approve_tasksheet(task_id: str, task_sheet_id: str, mod_cap_id: str, annotat
     # execute transaction and return result
     tx_result = handle_result(txn.execute())    
     return True if tx_result.effects.status.status == "success"  else False
-
-
-
-# call function
-# approve_tasksheet(task_id, task_sheet_id, mod_cap_id, annotation)
