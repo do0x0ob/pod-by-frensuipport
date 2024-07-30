@@ -170,8 +170,3 @@ async def get_submissions():
     print(f"Task info has been written to {task_info_file_path}")
     #print("debug", submissions)
     return submissions
-
-"""
-if __name__ == "__main__":
-    asyncio.run(get_submissions())
-"""

@@ -6,7 +6,7 @@ from constants import SUI_CLOCK_ID, TESTNET_PACKAGE_ID
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-def approve_tasksheet(task_id: str, task_sheet_id: str, mod_cap_id: str, annotation: str):
+def approve_tasksheet(reward_type: str, task_id: str, task_sheet_id: str, mod_cap_id: str, annotation: str):
     '''approve a tasksheet'''
     '''
     target: frensuipport testnet package function  --approve_and_send_reward
@@ -31,7 +31,7 @@ def approve_tasksheet(task_id: str, task_sheet_id: str, mod_cap_id: str, annotat
         ObjectID(mod_cap_id),
     ]
     # type<T> #TODO: dynamically
-    type_arguments = ["0xe08560c1186b5d6cee1623c1a251f0879e998ded8c27f64302632f18cadea5f2::faucet_eyes::FAUCET_EYES"]
+    type_arguments = [reward_type]
 
     # add move call order
     txn.move_call(
