@@ -51,6 +51,7 @@ def reject_tasksheet(task_sheet_id: str, mod_cap_id: str, annotation: str):
     arguments:
         task_sheet_id: tasksheet, get from currently displaying content object ID.
         annotation: words by mod, get from TUI text input area.
+        mod_cap_id: mod cap id for the associated main task, get from config file.
     """
     client = SyncClient(SuiConfig.default_config())
     txn = SyncTransaction(client=client)
