@@ -167,5 +167,10 @@ async def get_submissions():
         json.dump(task_info, f, ensure_ascii=False, indent=2)
     
     print(f"Task info has been written to {task_info_file_path}")
-    print("debug", submissions)
+    #print("debug", submissions)
     return submissions
+
+"""
+if __name__ == "__main__":
+    asyncio.run(get_submissions())
+"""
