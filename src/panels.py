@@ -5,7 +5,7 @@ from textual.containers import Container, Horizontal, VerticalScroll
 from textual.widgets import Button, TextArea, ContentSwitcher
 from textual.app import ComposeResult
 from custom_widgets import WalletList, NetworkEnvironmentWidget, FunctionSwitches, WalletContent, PanelController
-from movecall import approve_tasksheet
+from movecall import approve_tasksheet, reject_tasksheet
 
 
 class LeftPanel(VerticalScroll):
@@ -18,7 +18,6 @@ class LeftPanel(VerticalScroll):
 
     def compose(self) -> ComposeResult:
         self.border_title = ":: Wallet"
-        
         yield NetworkEnvironmentWidget(id="network", classes="hatch cross_theme")
         with Container(id="wallet-container"):
             yield WalletList(self.client, id="wallet-list")
@@ -39,9 +38,7 @@ class BottomRight(Horizontal):
 
     def compose(self) -> ComposeResult:
         self.border_title = ":: Annotations"
-        
         yield TextArea(id="annotation_input")
-        
         snippets = Horizontal(id="snippets", classes="hatch cross")
         snippets.border_title = ":: Caution ::"
         with snippets:
@@ -89,24 +86,32 @@ class BottomRight(Horizontal):
         config = self.load_modcap_config()
         return config.get(maintask_id)
 
-    
+    # Approve Button Clicked Event
     @on(Button.Pressed, "#approve")
     def handle_approve(self) -> None:
-        task_data = self.collect_task_data()
+        task_data = self.collect_task_data(operation="approve")
         if not self.validate_task_data(task_data):
             return
 
         res = self.submit_approval(task_data)
         self.handle_approval_result(res)
 
-    def collect_task_data(self):
-        return {
+    
+    def collect_task_data(self, operation):
+        data = {
             'annotation': self.query_one("#annotation_input", TextArea).text,
             'task_sheet_id': self.screen.query_one("#top-right", ContentSwitcher).current.removeprefix("id_"),
-            'task_id': None,
-            'mod_cap_id': None,
-            'reward_type': None
+            'mod_cap_id': None
         }
+        if operation == 'approve':
+            data.update({
+                'task_id': None,
+                'reward_type': None
+            })
+        elif operation == 'decline':
+            pass
+        return data
+    
 
     def validate_task_data(self, data):
         if not data['task_sheet_id']:
@@ -148,3 +153,28 @@ class BottomRight(Horizontal):
         else:
             self.notify("Task Sheet Approval Failed", title="Failed", severity="error")
     
+   # Decline Button Clicked Event
+    @on(Button.Pressed, "#decline")
+    def handle_decline(self) -> None:
+        task_data = self.collect_task_data(operation='decline')
+        if not self.validate_task_data(task_data):
+            return
+
+        res = self.submit_decline(task_data)
+        self.handle_decline_result(res)
+
+    def submit_decline(self, data):
+        return reject_tasksheet(
+            data['task_sheet_id'],
+            data['mod_cap_id'],
+            data['annotation']
+        )
+
+    def handle_decline_result(self, res):
+        if res:
+            self.query_one("#annotation_input", TextArea).clear()
+            self.app.action_refresh()
+            self.screen.action_splash()
+            self.notify("Task Sheet Declined Successfully", title="Decline", severity="information")
+        else:
+            self.notify("Task Sheet Decline Failed", title="Failed", severity="error")
