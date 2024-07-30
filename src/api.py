@@ -1,6 +1,5 @@
 import os
 import json
-import asyncio
 import warnings
 from typing import Optional, Tuple
 from pysui import SuiConfig, AsyncClient
@@ -163,7 +162,6 @@ async def get_submissions():
     
     print(f"Markdown contents have been written to {markdown_file_path}")
 
-
     task_info_file_path = 'task_info.json'
     with open(task_info_file_path, 'w', encoding='utf-8') as f:
         json.dump(task_info, f, ensure_ascii=False, indent=2)
@@ -171,6 +169,3 @@ async def get_submissions():
     print(f"Task info has been written to {task_info_file_path}")
     print("debug", submissions)
     return submissions
-
-if __name__ == "__main__":
-    asyncio.run(get_submissions())

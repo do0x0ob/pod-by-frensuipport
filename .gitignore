@@ -20,6 +20,9 @@ temp*.json
 temp_sub.py
 out*
 protocol.json
+task_info.json
+tasks_cache.json
+markdown_content.json
 backup/
 ser_deser_txn.py
 ser_sample.json

@@ -30,7 +30,7 @@ def approve_tasksheet(task_id: str, task_sheet_id: str, mod_cap_id: str, annotat
         ObjectID(SUI_CLOCK_ID),
         ObjectID(mod_cap_id),
     ]
-    type_arguments = ["0xe08560c1186b5d6cee1623c1a251f0879e998ded8c27f64302632f18cadea5f2::faucet_eyes::FAUCET_EYES"]  # type<T>
+    type_arguments = ["0xe08560c1186b5d6cee1623c1a251f0879e998ded8c27f64302632f18cadea5f2::faucet_eyes::FAUCET_EYES"]  # type<T> #TODO: dynamically
 
     # add move call order
     txn.move_call(
