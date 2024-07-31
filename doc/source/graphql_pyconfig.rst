@@ -256,7 +256,7 @@ alias, for example:
         """Add some keys to existing group."""
         block=[
             {"key_string":"ANlIGCd0ZdkpLGEsRTDzRF4q96ZQAJfuaU+G0/L93+I2","alias":"Foo"},
-            {"key_string":"AJj3zoXJMl2Eax5vw29na0w4DxO6PrMl3Zrrf1X/b9z4","alias":"Bar"},
+            {"key_string":"suiprivkey1qr3n55qy9v27a6lkwdp3jx2kcg7k3mndtsv2afsdnh086yjfntmsvgpkypq","alias":"Bar"},
             {"key_string":"AATnunevLZEyy9MFNQAWRESwhMmJucte+Gh5WjSOXC58","alias":None},
         ]
         addresses = cfg.add_keys(key_block=block, persist=False)
@@ -286,10 +286,10 @@ The following is an example of creating a fictional group:
 .. code-block:: python
 
     def add_new_group(cfg: PysuiConfiguration):
-        """."""
+        """Build a unique group."""
         key_blocks = [
             {"key_string": "ANlIGCd0ZdkpLGEsRTDzRF4q96ZQAJfuaU+G0/L93+I2", "alias": "Foo"},
-            {"key_string": "AJj3zoXJMl2Eax5vw29na0w4DxO6PrMl3Zrrf1X/b9z4", "alias": "Bar"},
+            {"key_string": "suiprivkey1qr3n55qy9v27a6lkwdp3jx2kcg7k3mndtsv2afsdnh086yjfntmsvgpkypq", "alias": "Bar"},
             {"key_string": "AATnunevLZEyy9MFNQAWRESwhMmJucte+Gh5WjSOXC58", "alias": None},
         ]
         profile_blocks = [
@@ -318,3 +318,34 @@ The following is an example of creating a fictional group:
         )
         for addy in addies:
             print(f"Address: {addy}")
+
+FAQ
+===
+
+Changing a configuration when in use by a pysui GraphQL client
+--------------------------------------------------------------
+
+Generally not a good idea especially changing the active_group or active_profile. You can however
+change the following safely:
+
+#. Change the active address to one that exists in the current active_group
+#. Add a new group without making it active
+#. Add a new profile
+#. Add new keys
+#. Create a new keypair
+
+Two simultaneous clients using unique profiles
+----------------------------------------------
+
+As each GraphQL url may have different scheme versions you don't want to switch the
+active profile as noted earlier. However you can create two instances of PysuiConfiguration. For example:
+
+.. code-block:: python
+
+    # First client points to devnet
+    devnet_cfg = PysuiConfiguration(group_name=PysuiConfiguration.SUI_GQL_RPC_GROUP,profile_name="devnet")
+    devnet_client = SyncGqlClient(pysui_config=cfg,write_schema=False)
+
+    # Next client points to testnet
+    testnet_cfg = PysuiConfiguration(group_name=PysuiConfiguration.SUI_GQL_RPC_GROUP,profile_name="testnet")
+    testnet_client = SyncGqlClient(pysui_config=cfg,write_schema=False)
