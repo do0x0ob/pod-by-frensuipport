@@ -1,20 +1,20 @@
 from time import time
-
-from textual.app import App, ComposeResult, RenderResult
+import math
+from textual.app import ComposeResult, RenderResult
+from textual.reactive import reactive
+from textual.widget import Widget
 from textual.containers import Container
 from textual.renderables.gradient import LinearGradient
 from textual.widgets import Static
+from rich.console import RenderableType
+from rich.text import Text
+from rich.style import Style
 from ascii_art import brand_slant
+
 COLORS = [
     "#881177",
     "#aa3355",
     "#cc6666",
-    #"#ee9944",
-    #"#eedd00",
-    #"#99dd55",
-    #"#44dd88",
-    #"#22ccbb",
-    #"#00bbcc",
     "#0099cc",
     "#3366bb",
     "#663399",
@@ -45,13 +45,34 @@ class Splash(Container):
         return LinearGradient(time() * 60, STOPS)  
 
 
-class SplashApp(App):
-    """Simple app to show our custom widget."""
+class TanhLoader(Widget):
+    DEFAULT_CSS = """
+    TanhLoader {
+        height: 2;
+        width: 1fr;
+    }
+    """
 
-    def compose(self) -> ComposeResult:
-        yield Splash()
+    values = reactive([0] * 42) 
+    colors = ["#881177", "#aa3355", "#cc6666", "#0099cc", "#3366bb", "#663399"] * 7  # repeat color list for 7 times
+    animation_step = reactive(0)
+    is_animating = reactive(True)
 
+    def on_mount(self):
+        self.set_interval(0.02, self.update_animation)
 
-if __name__ == "__main__":
-    app = SplashApp()
-    app.run()
+    def update_animation(self):
+        if not self.is_animating:
+            return
+
+        self.animation_step += 1
+        for i in range(42):
+            x = math.sin((self.animation_step + i * 4) * 0.1) * 2
+            self.values[i] = (x + 2) * 1.75
+
+    def render(self) -> RenderableType:
+        bars = []
+        for value, color in zip(self.values, self.colors):
+            bar = "▁▂▃▄▅▆▇█"[min(int(value), 7)]
+            bars.append(Text(bar, Style(color=color)))
+        return Text(" ").join(bars)

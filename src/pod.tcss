@@ -37,7 +37,7 @@
     background: #cc6666;
 
     &:focus {
-            text-style: none;
+            text-style: bold;
         }
 
     &.-active {
@@ -53,14 +53,10 @@
     height: 100%;
     column-span: 4;
     row-span: 4;
-    border: inner $panel;
     /*border: double #cc6666;*/
+    /*border: inner $panel;*/
     margin: 0;
     padding: 0;
-}
-
-#top-right.markdown-view {
-    border: double #cc6666;
 }
 
 #bottom-right {
@@ -77,7 +73,7 @@
     border: double #cc6666;
 }
 
-#void {
+#annotation_input {
     column-span: 3;
     padding: 0 1;
 }
@@ -104,20 +100,34 @@
 #wallet-content {
     padding: 1 0 0 0;
     text-align: center;
-    border: round #cc6666;
     scrollbar-color: #cc6666;
     scrollbar-color-hover: #0099cc;
     scrollbar-color-active: #cc6666;
     scrollbar-size-vertical: 1;
 }
 
+#submissions {
+    height: 100%;
+    scrollbar-color-hover: #0099cc;
+    scrollbar-color-active: #cc6666;
+    scrollbar-size-vertical: 1;
+    border: round #cc6666;
+}
+
+.main_task_group {
+    padding: 0 1;
+    height: auto;
+    margin-bottom: 1;
+}
+
 #wallet-list > Contents {
-    padding: 1 0 0 0;
+    padding: 1 1 0 0;
 }
 
 #wallet-list {
     border: round #cc6666;
     height: auto;
+    padding: 0 1;
 }
 
 #top-right .render_splash {
@@ -126,6 +136,28 @@
     margin: 0;
     padding: 0;
     border-title-color: #cc6666;
+}
+
+#loading {
+    align: center middle;
+    padding: 0 1;
+    width: auto;
+}
+
+MarkdownViewer {
+    scrollbar-color: #cc6666;
+    scrollbar-color-hover: #0099cc;
+    scrollbar-color-active: #cc6666;
+    scrollbar-size-vertical: 1;
+}
+
+#top-right.splash-view {
+    border: inner $panel;
+}
+
+
+#top-right.markdown-view {
+    border: double #cc6666;
 }
 
 LoadingScreen {
@@ -146,7 +178,7 @@ Horizontal > Static {
 }
 
 ListView > ListItem.--highlight {
-    background: #0099cc;
+    background: #0099cc 80%;
 }
 
 TextArea {
@@ -182,19 +214,62 @@ ToastRack {
     align: center top;
 }
 
+OptionList {
+        background: transparent;
+        border: transparent;
+        padding: 0;
+    }
+
+OptionList:focus {
+        border: blank;
+}
+
+OptionList:focus > .option-list--option-highlighted {
+        background: #0099cc 80%;
+}
+
+TanhLoader {
+    height: 1;
+}
+
+.invisible_border {
+    border: inner $panel;
+}
+
+.visible_border {
+    border: double #cc6666;
+}
+
+
 .switch_container {
     height: auto;
     width: 100%;
     align: center middle;
 }
 
+.taskname {
+    width: 100%;
+    padding: 0 0;
+    border: blank;
+    color: #cc6666;
+    text-style: bold italic underline;
+}
+
+.task_container {
+    width: 100%;
+    height: 3;
+}
+
 
 .hatch {
     &.cross_theme {
-        hatch: cross #cc6666 80%;
+        hatch: cross #cc6666 60%;
     }
     &.cross {
         hatch: cross $panel-lighten-1;
+    }
+    &.right {
+        hatch: right #cc6666 50%
     }
 }
 
@@ -203,4 +278,8 @@ ToastRack {
     height: auto;
     align: center middle;
     text-style: bold;
+}
+
+.options_container {
+    height: auto;
 }

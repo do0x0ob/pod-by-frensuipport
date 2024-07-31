@@ -5,13 +5,17 @@ from textual.reactive import reactive
 from textual import events
 from pysui import SuiConfig, AsyncClient
 from screens import LoadingScreen, Mod_Screen
+from api import get_submissions
 
 class Pod_By_FrenSuipport(App):
     CSS_PATH = "pod.tcss"
     BINDINGS = [
-        Binding(key="q", action="quit", description="Quit the app"),
+        Binding(key="Q", action="quit", description="Quit the app"),
         Binding(key="l", action="toggle_lock", description="Lock the Screen"),
         Binding(key="s", action="splash", description="Splash!"),
+        Binding(key="f5", action="refresh", description="Refresh wallet content"),
+        Binding(key="A", action="approve", description="Approve"),
+        Binding(key="D", action="decline", description="Decline"),
         Binding(
             key="question_mark",
             action="help",
@@ -33,10 +37,11 @@ class Pod_By_FrenSuipport(App):
 
     def on_mount(self) -> None:
         self.push_screen("loading")
-        self.set_timer(2.5, self.load_main_screen)
+        self.set_timer(1, self.load_main_screen)
 
     async def on_load(self) -> None:
         await self.init_client()
+        await get_submissions()
 
     async def init_client(self) -> None:
         cfg = SuiConfig.default_config()
@@ -65,6 +70,21 @@ class Pod_By_FrenSuipport(App):
     def action_splash(self) -> None:
         if isinstance(self.screen, Mod_Screen):
             self.screen.action_splash()
+    
+    def action_refresh(self) -> None:
+        if isinstance(self.screen, Mod_Screen):
+            wallet_content = self.screen.query_one("WalletContent")
+            if wallet_content:
+                wallet_content.load_wallet_content()
+    
+    def action_approve(self) -> None:
+        if isinstance(self.screen, Mod_Screen):
+            self.screen.handle_approve()
+
+    def action_decline(self) -> None:
+        if isinstance(self.screen, Mod_Screen):
+            self.screen.handle_decline()
+    
 
 if __name__ == "__main__":
     app = Pod_By_FrenSuipport()
