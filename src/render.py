@@ -1,7 +1,6 @@
 from time import time
 import math
-
-from textual.app import App, ComposeResult, RenderResult
+from textual.app import ComposeResult, RenderResult
 from textual.reactive import reactive
 from textual.widget import Widget
 from textual.containers import Container
@@ -11,16 +10,11 @@ from rich.console import RenderableType
 from rich.text import Text
 from rich.style import Style
 from ascii_art import brand_slant
+
 COLORS = [
     "#881177",
     "#aa3355",
     "#cc6666",
-    #"#ee9944",
-    #"#eedd00",
-    #"#99dd55",
-    #"#44dd88",
-    #"#22ccbb",
-    #"#00bbcc",
     "#0099cc",
     "#3366bb",
     "#663399",
@@ -82,16 +76,3 @@ class TanhLoader(Widget):
             bar = "▁▂▃▄▅▆▇█"[min(int(value), 7)]
             bars.append(Text(bar, Style(color=color)))
         return Text(" ").join(bars)
-
-"""
-class SplashApp(App):
-    ''' app to show our custom widget.'''
-
-    def compose(self) -> ComposeResult:
-        yield Splash()
-
-
-if __name__ == "__main__":
-    app = SplashApp()
-    app.run()
-"""

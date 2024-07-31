@@ -107,3 +107,11 @@ class Mod_Screen(Screen):
             self.notify("Sending approving...", title="Approval", severity="information")
         elif event.button.id == "decline":
             self.notify("Declining task sheet...", title="Decline", severity="error")
+    
+    def handle_approve(self) -> None:
+        bottom_right = self.query_one(BottomRight)
+        bottom_right.handle_approve()
+
+    def handle_decline(self) -> None:
+        bottom_right = self.query_one(BottomRight)
+        bottom_right.handle_decline()
