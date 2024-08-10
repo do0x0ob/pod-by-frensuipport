@@ -95,7 +95,7 @@ def load_schema_cache(
     """."""
     schema_mgr: Schema = None
     # TODO: Temporary Sui devnet bug workaround
-    if genv != "devnet":
+    if not genv.startswith("devnet"):
         _furl = gurl + "/" + default_version if default_version else gurl
     else:
         _furl = gurl
@@ -131,7 +131,7 @@ def load_schema_cache(
             _url, _init_client, _base_version, _long_version, _schema, _rpc_config
         )
 
-    if genv == "devnet":
+    if genv.startswith("devnet"):
         return schema_mgr
 
     while schema_mgr._present_schemas:
@@ -155,10 +155,14 @@ def load_schema_cache(
             _base_version = ".".join(_long_version.split(".")[:2])
             _schema: DSLSchema = DSLSchema(_iclient.schema)
             qstr, fndeser = pgql_config(genv, _base_version)
-            _rpc_config = fndeser(session.execute(gql(qstr)))
-            _rpc_config.gqlEnvironment = genv
-            schema_mgr._cache_schema_set(
-                _url, _iclient, _base_version, _long_version, _schema, _rpc_config
-            )
+            try:
+                _rpc_config = fndeser(session.execute(gql(qstr)))
+                _rpc_config.gqlEnvironment = genv
+                schema_mgr._cache_schema_set(
+                    _url, _iclient, _base_version, _long_version, _schema, _rpc_config
+                )
+            except texc.TransportQueryError as gte:
+                schema_mgr._present_schemas.remove(_base_version)
+                schema_mgr._all_versions.remove(_base_version)
 
     return schema_mgr

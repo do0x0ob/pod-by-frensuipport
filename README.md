@@ -17,7 +17,7 @@ Python Client SDK for Sui blockchain
 
 ## pysui SDK current (github)
 
-**Release-0.66.0**
+**Release-0.67.0**
 
 - Supports _SUI 1.29.x RPC API_
 - Backwards compatable to _Sui 1.21.x RPC API_
@@ -26,7 +26,7 @@ See [CHANGELOG](https://github.com/FrankC01/pysui/blob/main/CHANGELOG.md)
 
 ## PyPi current
 
-**Release-0.65.0 - Released 2024-07-18**
+**Release-0.66.0 - Released 2024-08-04**
 
 **_BREAKING CHANGES to GraphQL support_**
 
